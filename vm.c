@@ -268,6 +268,15 @@ add_pg_to_metadata(char* va) {
   p_iter->idx_swp = -1;
 }
 
+static void
+rm_pg_metadata(char* va){
+  struct pg* pg = proc->pg_data.pgs;
+  pg = find_pg(va);
+  if (pg) {
+    
+  }
+}
+
 // Allocate page tables and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
   int
@@ -326,6 +335,9 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       char *v = p2v(pa);
       kfree(v);
       *pte = 0;
+      if (proc != 0) {
+        rm_pg_metadta((char *) a);
+      }
     }
   }
   return newsz;
