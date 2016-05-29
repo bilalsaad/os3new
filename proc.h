@@ -13,6 +13,8 @@ struct pg {
   uint id;          // virtual address
   uint idx_swp;     // index in swap file.
   enum pg_st state; // guess
+  uint ctime;       // creation time of the page.
+  uint nfu_time;    // bit counter for NFU.
 };
 struct pg_data {
   int total_pgs;

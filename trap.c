@@ -54,6 +54,9 @@ trap(struct trapframe *tf)
       wakeup(&ticks);
       release(&tickslock);
     }
+#ifdef SEL_NFU
+  if(proc) nfu_update();
+#endif
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE:
@@ -78,9 +81,11 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
   case T_PGFLT:
+#ifndef SEL_NONE
     if(pg_fault()){
       break;
     }
+#endif
   
 
   //PAGEBREAK: 13

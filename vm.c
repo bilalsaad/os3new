@@ -214,8 +214,90 @@ loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
   }
   return 0;
 }
+#define INFINITY 0xffffffff;
+#ifndef SEL_NONE
+#define END proc->pg_data.pgs + MAX_TOTAL_PAGES
+#ifdef SEL_FIFO
+struct pg* pick_page(void) {
+  struct pg* it = proc->pg_data.pgs; 
+  struct pg dummy_min;
+  struct pg* min = &dummy_min;
+  dummy_min.ctime = INFINITY; 
+  while(it != END) {
+    if(it->state == RAM)
+      min = min->ctime > it->ctime ? it : min;
+    ++it; 
+  }
+  if (&dummy_min == min)
+    panic("could not choose page");
+  return min;
+}
+#endif
 
-struct pg* 
+#ifdef SEL_SCFIFO
+struct pg* pick_page(void) {
+  struct pg* it = proc->pg_data.pgs + 3; 
+  struct pg dummy_min;
+  struct pg* min = &dummy_min;
+  pde_t* pe;
+  
+  dummy_min.ctime = INFINITY;
+  for(;;) {
+    it = proc->pg_data.pgs + 3;
+    while(it != END) {
+      if(it->state == RAM)
+        min = min->ctime > it->ctime ? it : min;
+      ++it; 
+    }
+    if(min == &dummy_min)
+      panic("could not choose page");
+
+    // check the PTE_A thing
+    pe = walkpgdir(proc->pgdir, (void*) min->id, 0);
+    if (*pe & PTE_A) // accesses
+      *pe &= (~PTE_A); // turn it off
+    else
+      break; // found a fifo..
+  }
+  return min;
+}
+#endif
+
+#ifdef SEL_NFU
+struct pg* pick_page(void) {
+  struct pg* it = proc->pg_data.pgs; 
+  struct pg dummy_min;
+  struct pg* min = &dummy_min;
+  dummy_min.ctime = INFINITY; 
+  while(it != END) {
+    if(it->state == RAM)
+      min = min->nfu_time > it->nfu_time ? it : min;
+    ++it; 
+  }
+  if (&dummy_min == min)
+    panic("could not choose page");
+  return min;
+}
+
+void nfu_update(void) {
+  struct pg* iter = proc->pg_data.pgs;
+  pde_t* pte;
+
+  while(iter < END) {
+    if(iter->state != PG_UNUSED) {
+      iter->nfu_time >>= 1; // ageing -  shift it
+      pte = walkpgdir(proc->pgdir, (void*) iter->id, 0);
+      
+      if(*pte && *pte & PTE_A) { // was used so turn the bit one
+        iter->nfu_time |= 0x8000;
+        *pte = *pte & ~PTE_A;
+      }
+    }
+      ++iter;
+  }
+}
+#endif
+/*struct pg* 
 pick_page(void) {
   struct pg* it = proc->pg_data.pgs+3;
   while(it != proc->pg_data.pgs + MAX_TOTAL_PAGES) {
@@ -224,8 +306,8 @@ pick_page(void) {
     ++it;
   }
   return it;
-}
-
+}*/
+#endif
 int get_swap_cell(struct pg* pg) {
   int i = 0;
   struct swapfile_cell* cells = proc->pg_data.cells;
@@ -241,13 +323,14 @@ int get_swap_cell(struct pg* pg) {
   panic("no cells");
   return -1; 
 }
+#ifndef SEL_NONE
 static int 
 swapout(struct pg* pg) {
   pde_t* pe;   // page table entry of the page we want to swapout
   uint va = pg->id;     // id of the page
+  ++proc->pg_data.pg_swapouts;
   if(writeToSwapFile(proc, (char *) va, get_swap_cell(pg) * PGSIZE, PGSIZE) < 0)
     panic("write to swap file faieled wdasdad ");
-  cprintf("swapping out page %p \n", va);
   if((pe = walkpgdir(proc->pgdir,(void *)  va, 0)) == 0)
     panic("swapout, address should exist \n");
   pg->state = DISK; 
@@ -255,28 +338,49 @@ swapout(struct pg* pg) {
   kfree((char *) p2v(PTE_ADDR(*pe) ));
   return 1;
 }
+#endif
+
+#ifndef SEL_NONE
+static struct pg*
+find_pg(uint va) {
+  struct pg* pg = proc->pg_data.pgs;
+  uint id = va & 0xFFFFF000; 
+  while(pg < proc->pg_data.pgs + MAX_TOTAL_PAGES) {
+    if (pg->id == id)
+      return pg;
+    ++pg;
+  }
+  return 0;
+}
 
 static void
-add_pg_to_metadata(char* va) {
+add_pg_to_metadata(uint va) {
   struct pg* p_iter = proc->pg_data.pgs;
-
   while(p_iter->state != PG_UNUSED &&
       p_iter < proc->pg_data.pgs + MAX_TOTAL_PAGES)
     p_iter++;
   p_iter->state = RAM;
-  p_iter->id = (uint) va;
+  p_iter->id = (uint) PTE_ADDR(va);
   p_iter->idx_swp = -1;
+  p_iter->ctime = ticks;
 }
-
+// this page has to be in the ram ? amiright?
 static void
 rm_pg_metadata(char* va){
   struct pg* pg = proc->pg_data.pgs;
-  pg = find_pg(va);
-  if (pg) {
-    
+  pg = find_pg((uint)va);
+  if (pg && 0) {
+   switch (pg->state) {
+     case PG_UNUSED:
+       break;
+     case DISK:
+       proc->pg_data.cells[pg->idx_swp].taken = 0;
+     case RAM:
+       pg->state = PG_UNUSED;
+   } 
   }
 }
-
+#endif
 // Allocate page tables and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
   int
@@ -293,10 +397,12 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 
   a = PGROUNDUP(oldsz);
   for(; a < newsz; a += PGSIZE){
+#ifndef SEL_NONE
     ++proc->pg_data.total_pgs;
     if (proc->pg_data.ram_pgs == MAX_PSYC_PAGES) { // need to swap one out
       swapout(pick_page());
     } else ++proc->pg_data.ram_pgs;
+#endif
     mem = kalloc();
     if(mem == 0){
       cprintf("allocuvm out of memory\n");
@@ -305,7 +411,9 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
     }
     memset(mem, 0, PGSIZE);
     mappages(pgdir, (char*)a, PGSIZE, v2p(mem), PTE_W|PTE_U);
-    add_pg_to_metadata((char *) a);
+ #ifndef SEL_NONE
+    add_pg_to_metadata(a);
+ #endif
   }
   return newsz;
 }
@@ -335,9 +443,12 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       char *v = p2v(pa);
       kfree(v);
       *pte = 0;
+#ifndef SEL_NONE
       if (proc != 0) {
-        rm_pg_metadta((char *) a);
+        --proc->pg_data.ram_pgs;
+        rm_pg_metadata((char *) a);
       }
+#endif
     }
   }
   return newsz;
@@ -394,13 +505,14 @@ copyuvm(pde_t *pgdir, uint sz)
       panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
+#ifndef SEL_NONE
     if (*pte & PTE_PG) { // the page is out out.
-      // what to do.. what to do..
         if(mappages(d, (void*) i, PGSIZE, 0, flags) < 0)
           goto bad;
         *pte &= (~PTE_P);
         continue;
     }
+#endif
     if((mem = kalloc()) == 0)
       goto bad;
     memmove(mem, (char*)p2v(pa), PGSIZE);
@@ -454,18 +566,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   }
   return 0;
 }
-
-static struct pg*
-find_pg(uint va) {
-  struct pg* pg = proc->pg_data.pgs;
-  uint id = va & 0xFFFFF000; 
-  while(pg < proc->pg_data.pgs + MAX_TOTAL_PAGES) {
-    if (pg->id == id)
-      return pg;
-    ++pg;
-  }
-  return 0;
-}
+#ifndef SEL_NONE
 static int
 swapin(uint va) { // fault address
   char* mem;
@@ -477,24 +578,25 @@ swapin(uint va) { // fault address
   if(mem == 0)
     panic("kalloc failed in swapin");
   memset(mem, 0, PGSIZE);
+  cprintf("reading from index %d \n", pg->idx_swp);
   readFromSwapFile(proc, mem, pg->idx_swp * PGSIZE, PGSIZE);
   mappages(proc->pgdir, (void*) va, PGSIZE, (uint)v2p(mem), PTE_U | PTE_W);
   
   pg->state = RAM;
   proc->pg_data.cells[pg->idx_swp].taken = 0;
   pg->idx_swp = -1;
+  pg->ctime = ticks;
 
 
   return 1;
 }
-
 int
 pg_fault(void) {
   uint va;
   pde_t* pte;
   va = rcr2();
-  cprintf("page fault for %p \n", va);
   pte = walkpgdir(proc->pgdir, (void *) va, 0);
+  cprintf("sdasdadad \n"); 
   if(!pte || !(*pte & PTE_PG)) {
     return 0;
   }
@@ -504,6 +606,7 @@ pg_fault(void) {
   }
   return swapin(va);
 }
+#endif
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

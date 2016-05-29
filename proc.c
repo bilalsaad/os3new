@@ -121,6 +121,7 @@ growproc(int n)
   switchuvm(proc);
   return 0;
 }
+#ifndef SEL_NONE
 static void
 copy_swap_file(struct proc* src, struct proc* dst) {
   char c;
@@ -131,6 +132,7 @@ copy_swap_file(struct proc* src, struct proc* dst) {
     ++i;
   }
 }
+#endif
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -157,11 +159,11 @@ fork(void)
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
-
+#ifndef SEL_NONE
   createSwapFile(np);
   copy_swap_file(np, np->parent);
   memmove(&np->pg_data, &np->parent->pg_data, sizeof(np->pg_data));
-
+#endif
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i])
       np->ofile[i] = filedup(proc->ofile[i]);
@@ -190,7 +192,9 @@ exit(void)
 
   if(proc == initproc)
     panic("init exiting");
+#ifndef SEL_NONE
   removeSwapFile(proc);
+#endif
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
     if(proc->ofile[fd]){
@@ -251,7 +255,9 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+#ifndef SEL_NONE
         memset(&p->pg_data, 0, sizeof(p->pg_data));
+#endif 
         release(&ptable.lock);
         return pid;
       }
@@ -441,35 +447,28 @@ kill(int pid)
   release(&ptable.lock);
   return -1;
 }
-
+#ifndef SEL_NONE
 static void
 print_page_stuff(struct proc* p) {
-  int i = 0;
   struct pg* p_iter = p->pg_data.pgs;
   int cts[3] = {0, 0, 0};
   cprintf("\n");
   while(p_iter && p_iter < p->pg_data.pgs + MAX_TOTAL_PAGES) {
-    if(p_iter->state != PG_UNUSED) {
+   /* if(p_iter->state != PG_UNUSED) {
       cprintf("id %p ", p_iter->id);
       cprintf("state %s ", p_iter->state == PG_UNUSED? " UNUSED" :
                            (p_iter->state == RAM ? " IN MEMORY" :
                             (p_iter->state == DISK ? "ON SWAP FILE ":
                              "???")));
       cprintf("%d \n", i++);
-    }
+    } */
     cts[p_iter->state]++;
     p_iter++;
   }
-  //TODO(DELETE THIS)
-/*  cprintf(" n_p_pages: %d n_pages %d \n", p->swap_handler.n_p_pgs,
-                                          p->swap_handler.n_pgs);
-  cprintf(" allocated_memory_pages:%d page_out:%d page_faults:%d paged_out:%d ",
-    cts[PG_UNUSED],
-    cts[DISK],
-    p->pg_data.n_pg_flts,
-    p->pg_data.n_pg_out);
-  cprintf("\n"); */
+  cprintf(" %d %d %d %d ",
+      cts[RAM], cts[DISK], p->pg_data.pg_faults, p->pg_data.pg_swapouts); 
 }
+#endif
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
@@ -497,7 +496,9 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
+#ifndef SEL_NONE
     print_page_stuff(p);
+#endif
     cprintf("%d %s %s", p->pid, state, p->name);
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);

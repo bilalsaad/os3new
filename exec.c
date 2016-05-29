@@ -39,6 +39,9 @@ exec(char *path, char **argv)
   // Load program into memory.
   sz = 0;
   memset(&proc->pg_data, 0, sizeof(proc->pg_data));
+  for (i = 0; i < MAX_TOTAL_PAGES; ++i) {
+    proc->pg_data.pgs[i].state = PG_UNUSED;
+  }
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -94,6 +97,7 @@ exec(char *path, char **argv)
   proc->sz = sz;
   proc->tf->eip = elf.entry;  // main
   proc->tf->esp = sp;
+  procdump();
   switchuvm(proc);
   freevm(oldpgdir);
   return 0;
