@@ -444,31 +444,24 @@ kill(int pid)
 
 static void
 print_page_stuff(struct proc* p) {
-  int i = 0;
+  // int i = 0;
   struct pg* p_iter = p->pg_data.pgs;
   int cts[3] = {0, 0, 0};
-  cprintf("\n");
+  // cprintf("\n");
   while(p_iter && p_iter < p->pg_data.pgs + MAX_TOTAL_PAGES) {
-    if(p_iter->state != PG_UNUSED) {
+    /*if(p_iter->state != PG_UNUSED) {
       cprintf("id %p ", p_iter->id);
       cprintf("state %s ", p_iter->state == PG_UNUSED? " UNUSED" :
                            (p_iter->state == RAM ? " IN MEMORY" :
                             (p_iter->state == DISK ? "ON SWAP FILE ":
                              "???")));
       cprintf("%d \n", i++);
-    }
+    }*/
     cts[p_iter->state]++;
     p_iter++;
   }
-  //TODO(DELETE THIS)
-/*  cprintf(" n_p_pages: %d n_pages %d \n", p->swap_handler.n_p_pgs,
-                                          p->swap_handler.n_pgs);
-  cprintf(" allocated_memory_pages:%d page_out:%d page_faults:%d paged_out:%d ",
-    cts[PG_UNUSED],
-    cts[DISK],
-    p->pg_data.n_pg_flts,
-    p->pg_data.n_pg_out);
-  cprintf("\n"); */
+  cprintf("\nram pages: %d paged out: %d total pg faults: %d total swap outs: %d\n", cts[RAM], cts[DISK], p->pg_data.pg_faults, 
+    p->pg_data.pg_swapouts);
 }
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
@@ -497,13 +490,20 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
+    cprintf("%d %s ", p->pid, state);
     print_page_stuff(p);
-    cprintf("%d %s %s", p->pid, state, p->name);
+    cprintf(" %s", p->name);
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)
         cprintf(" %p", pc[i]);
     }
-    cprintf("\n");
+    cprintf("\n\n");
   }
+
+  //fkfkfkfkdsfsdfksdfkfkfkffk :@#^&*(*($#)) not working :(
+  #if TRUE 
+    cprintf("%d\% free pages in the system\n",
+                 getFreePagesNum() * 100 / freePages);
+  #endif
 }

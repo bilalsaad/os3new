@@ -8,7 +8,7 @@ struct rtcdate;
 struct spinlock;
 struct stat;
 struct superblock;
-
+int freePages;
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -70,6 +70,7 @@ char*           kalloc(void);
 void            kfree(char*);
 void            kinit1(void*, void*);
 void            kinit2(void*, void*);
+int 			getFreePagesNum(void);
 
 // kbd.c
 void            kbdintr(void);

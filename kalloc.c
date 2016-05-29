@@ -40,6 +40,8 @@ kinit2(void *vstart, void *vend)
 {
   freerange(vstart, vend);
   kmem.use_lock = 1;
+
+  freePages = getFreePagesNum();
 }
 
 void
@@ -49,6 +51,18 @@ freerange(void *vstart, void *vend)
   p = (char*)PGROUNDUP((uint)vstart);
   for(; p + PGSIZE <= (char*)vend; p += PGSIZE)
     kfree(p);
+}
+
+int
+getFreePagesNum() {
+  int count = 0;
+  struct run *it = kmem.freelist;
+  while(it != 0) {
+    count++;
+    it = it->next;
+  } 
+
+  return count;
 }
 
 //PAGEBREAK: 21

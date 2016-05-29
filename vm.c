@@ -253,6 +253,7 @@ swapout(struct pg* pg) {
   pg->state = DISK; 
   *pe = (*pe | PTE_PG) & ~PTE_P;
   kfree((char *) p2v(PTE_ADDR(*pe) ));
+  ++proc->pg_data.pg_swapouts;
   return 1;
 }
 
@@ -266,6 +267,22 @@ add_pg_to_metadata(char* va) {
   p_iter->state = RAM;
   p_iter->id = (uint) va;
   p_iter->idx_swp = -1;
+}
+
+static void
+rm_pg_metadata(char* va) {
+  struct pg* p_iter = proc->pg_data.pgs;
+
+  while(p_iter < proc->pg_data.pgs + MAX_TOTAL_PAGES) {
+    if(p_iter->id != (uint) va && p_iter->state != PG_UNUSED) {
+      --proc->pg_data.total_pgs;
+      --proc->pg_data.ram_pgs;
+      p_iter->state = PG_UNUSED;
+      p_iter->id = 0;
+      break;
+    }
+    p_iter++;
+  }
 }
 
 // Allocate page tables and physical memory to grow process from oldsz to
@@ -326,6 +343,7 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       char *v = p2v(pa);
       kfree(v);
       *pte = 0;
+      rm_pg_metadata((char*) a);
     }
   }
   return newsz;
