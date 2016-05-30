@@ -236,14 +236,14 @@ struct pg* pick_page(void) {
 
 #ifdef SEL_SCFIFO
 struct pg* pick_page(void) {
-  struct pg* it = proc->pg_data.pgs + 3; 
+  struct pg* it = proc->pg_data.pgs; 
   struct pg dummy_min;
   struct pg* min = &dummy_min;
   pde_t* pe;
   
   dummy_min.ctime = INFINITY;
   for(;;) {
-    it = proc->pg_data.pgs + 3;
+    it = proc->pg_data.pgs;
     while(it != END) {
       if(it->state == RAM)
         min = min->ctime > it->ctime ? it : min;
@@ -335,7 +335,8 @@ swapout(struct pg* pg) {
     panic("swapout, address should exist \n");
   pg->state = DISK; 
   *pe = (*pe | PTE_PG) & ~PTE_P;
-  kfree((char *) p2v(PTE_ADDR(*pe) ));
+  cprintf("called kfree with %p \n", (char*) p2v(PTE_ADDR(*pe)));
+  kfree((char *) p2v(PTE_ADDR(*pe)));
   return 1;
 }
 #endif
@@ -438,10 +439,14 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       a += (NPTENTRIES - 1) * PGSIZE;
     else if((*pte & PTE_P) != 0){
       pa = PTE_ADDR(*pte);
-      if(pa == 0)
+      if(pa == 0) {
+        d2;
         panic("kfree");
-      char *v = p2v(pa);
-      kfree(v);
+      }
+      if (!(*pte & PTE_PG)) {
+        char *v = p2v(pa);
+        kfree(v);
+      }
       *pte = 0;
 #ifndef SEL_NONE
       if (proc != 0) {
@@ -506,7 +511,7 @@ copyuvm(pde_t *pgdir, uint sz)
     flags = PTE_FLAGS(*pte);
 #ifndef SEL_NONE
     if (*pte & PTE_PG) { // the page is out out.
-        if(mappages(d, (void*) i, PGSIZE, 0, flags) < 0)
+        if(mappages(d, (void*) i, PGSIZE, 0xfffff, flags) < 0)
           goto bad;
         *pte &= (~PTE_P);
         continue;

@@ -2,42 +2,44 @@
 #include "stat.h"
 #include "user.h"
 
+#define N 13
 int
 main(int argc, char *argv[])
 {
-    int n=6;
-    void * pages[n];
+    void * pages[N];
     
     int pid1;
-    int pid2;
+    int pid2 = 12;
     //char cc[10]; 
     pid1=fork();
     
     int i;
-    for (i=0; i<n; i++) {
+    for (i=0; i<N; i++) {
         pages[i]=sbrk(4096);
     }
     
-    for (i=0; i<n; i++) {
+    for (i=0; i<N; i++) {
         *(int *)pages[i] = i;
     }
     pid2=fork();
     
     printf(1,"-------------------------------------------AFTER SECOND FORK\n");
     
-    for (i=0; i<n; i++) {
-       printf(1,"\n\n\n------------------TEST MASSIVE %d   pid %d\n\n\n", *((int *)pages[i]),getpid() );
+    for (i=0; i<N; i++) {
+       printf(1,"\n\n\n------------------TEST MASSIVE %d   pid %d\n\n\n",
+           *((int *)pages[i]),getpid() );
     }
-     printf(1,"\n\n\n-----------------------------------------------------BEFORE WAIT\n\n\n\n");
+     printf(1,
+         "\n\n\n---------------------------------BEFORE WAIT\n\n\n\n");
    
     if(pid1>0)
       wait();
     
     if (pid2>0)
       wait();
-  printf(1, "%d %d \n ", pid1, pid2);
+    printf(1, "%d %d \n ", pid1, pid2);
   
-   printf(1,"--------------------------AFTER WAIT\n");
+   printf(1,"--------------------------FGINISH \n");
    exit();
 }
  

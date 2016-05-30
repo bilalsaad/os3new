@@ -451,17 +451,18 @@ kill(int pid)
 static void
 print_page_stuff(struct proc* p) {
   struct pg* p_iter = p->pg_data.pgs;
+  int i = 0;
   int cts[3] = {0, 0, 0};
   cprintf("\n");
   while(p_iter && p_iter < p->pg_data.pgs + MAX_TOTAL_PAGES) {
-   /* if(p_iter->state != PG_UNUSED) {
+    if(p_iter->state != PG_UNUSED) {
       cprintf("id %p ", p_iter->id);
       cprintf("state %s ", p_iter->state == PG_UNUSED? " UNUSED" :
                            (p_iter->state == RAM ? " IN MEMORY" :
                             (p_iter->state == DISK ? "ON SWAP FILE ":
                              "???")));
       cprintf("%d \n", i++);
-    } */
+    } 
     cts[p_iter->state]++;
     p_iter++;
   }
