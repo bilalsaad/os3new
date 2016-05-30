@@ -125,7 +125,7 @@ growproc(int n)
 static void
 copy_swap_file(struct proc* src, struct proc* dst) {
   char c;
-  int i = 0;
+  uint i = 0;
   if (src->swapFile == 0) return;
   while(readFromSwapFile(src, &c, i, sizeof(c)) > 0){
     writeToSwapFile(dst, &c, i, sizeof(c));
@@ -507,4 +507,5 @@ procdump(void)
     }
     cprintf("\n");
   }
+  cprintf("%d free pages in the system \n", get_page_percentage()); 
 }

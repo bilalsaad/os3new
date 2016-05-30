@@ -93,4 +93,38 @@ kalloc(void)
     release(&kmem.lock);
   return (char*)r;
 }
+// will hold the number of pages in the kernel.
+static uint kernel_pgs = 0;
 
+void count_kernel_pgs(void) {
+  struct run *r;
+  uint i = 0;
+  if (kmem.use_lock)
+    acquire(&kmem.lock);
+  r = kmem.freelist;
+  while(r) {
+    ++i;
+    r = r->next;
+  }
+  if (kmem.use_lock)
+    release(&kmem.lock);
+  kernel_pgs  = i;
+}
+
+
+uint get_page_percentage(void) {
+
+  struct run *r;
+  uint i = 0;
+  
+  if (kmem.use_lock)
+    acquire(&kmem.lock);
+  r = kmem.freelist;
+  while(r) {
+    ++i;
+    r = r->next;
+  }
+  if (kmem.use_lock)
+    release(&kmem.lock);
+  return (i * 100) / kernel_pgs;
+}

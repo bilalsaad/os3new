@@ -70,6 +70,8 @@ char*           kalloc(void);
 void            kfree(char*);
 void            kinit1(void*, void*);
 void            kinit2(void*, void*);
+void            count_kernel_pgs(void);
+uint            get_page_percentage(void);
 
 // kbd.c
 void            kbdintr(void);

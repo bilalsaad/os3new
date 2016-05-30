@@ -208,7 +208,7 @@ NBUF	param.h	12;"	d
 NCPU	param.h	3;"	d
 NDEV	param.h	7;"	d
 NDIRECT	fs.h	23;"	d
-NELEM	defs.h	192;"	d
+NELEM	defs.h	194;"	d
 NFILE	param.h	5;"	d
 NINDIRECT	fs.h	24;"	d
 NINODE	param.h	6;"	d
@@ -1528,6 +1528,7 @@ context	proc.h	/^struct context {$/;"	s
 copy_swap_file	proc.c	/^copy_swap_file(struct proc* src, struct proc* dst) {$/;"	f	file:
 copyout	vm.c	/^copyout(pde_t *pgdir, uint va, void *p, uint len)$/;"	f
 copyuvm	vm.c	/^copyuvm(pde_t *pgdir, uint sz)$/;"	f
+count_kernel_pgs	kalloc.c	/^void count_kernel_pgs(void) {$/;"	f
 cprintf	console.c	/^cprintf(char *fmt, ...)$/;"	f
 cpu	kernel.asm	/^  cpu = c;$/;"	d
 cpu	proc.h	/^  struct cpu *cpu;$/;"	m	struct:cpu	typeref:struct:cpu::cpu
@@ -1593,7 +1594,7 @@ d1d	sh.asm	/^     d1d:	c3                   	ret    $/;"	l
 d1e	sh.asm	/^     d1e:	55                   	push   %ebp$/;"	l
 d1f	sh.asm	/^     d1f:	89 e5                	mov    %esp,%ebp$/;"	l
 d1f	usertests.asm	/^     d1f:	7e a7                	jle    cc8 <exitwait+0xf>$/;"	l
-d2	defs.h	193;"	d
+d2	defs.h	195;"	d
 d2	ls.asm	/^  d2:	83 7d e4 00          	cmpl   $0x0,-0x1c(%ebp)$/;"	l
 d2	zombie.asm	/^  d2:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 d21	sh.asm	/^     d21:	83 ec 10             	sub    $0x10,%esp$/;"	l
@@ -2549,6 +2550,7 @@ gdt	proc.h	/^  struct segdesc gdt[NSEGS];   \/\/ x86 global descriptor table$/;"
 gdt	vm.c	/^struct segdesc gdt[NSEGS];$/;"	v	typeref:struct:segdesc
 gdtdesc	bootasm.S	/^gdtdesc:$/;"	l
 gdtdesc	entryother.S	/^gdtdesc:$/;"	l
+get_page_percentage	kalloc.c	/^uint get_page_percentage(void) {$/;"	f
 get_swap_cell	vm.c	/^int get_swap_cell(struct pg* pg) {$/;"	f
 getcallerpcs	spinlock.c	/^getcallerpcs(void *v, uint pcs[])$/;"	f
 getcmd	sh.c	/^getcmd(char *buf, int nbuf)$/;"	f
@@ -2714,6 +2716,8 @@ kalloc	kalloc.c	/^kalloc(void)$/;"	f
 kbdgetc	kbd.c	/^kbdgetc(void)$/;"	f
 kbdintr	kbd.c	/^kbdintr(void)$/;"	f
 kernel	kernel.asm	/^kernel:     file format elf32-i386$/;"	l
+kernel_pgs	kalloc.c	/^static uint kernel_pgs = 0;$/;"	v	file:
+kernel_pgs	kernel.asm	/^  kernel_pgs  = i;$/;"	d
 kfree	kalloc.c	/^kfree(char *v)$/;"	f
 kill	proc.c	/^kill(int pid)$/;"	f
 killed	proc.h	/^  int killed;                  \/\/ If non-zero, have been killed$/;"	m	struct:proc
@@ -3192,6 +3196,7 @@ r	echo.asm	/^  r = fstat(fd, st);$/;"	d
 r	forktest.asm	/^  r = fstat(fd, st);$/;"	d
 r	grep.asm	/^  r = fstat(fd, st);$/;"	d
 r	init.asm	/^  r = fstat(fd, st);$/;"	d
+r	kernel.asm	/^    r = r->next;$/;"	d
 r	kernel.asm	/^  r = (struct run*)v;$/;"	d
 r	kernel.asm	/^  r = kmem.freelist;$/;"	d
 r	kill.asm	/^  r = fstat(fd, st);$/;"	d
@@ -3460,6 +3465,7 @@ static	kernel.asm	/^static struct pg*$/;"	t
 static	kernel.asm	/^static struct proc*$/;"	t
 static	kernel.asm	/^static uchar$/;"	l
 static	kernel.asm	/^static uint cmos_read(uint reg)$/;"	l
+static	kernel.asm	/^static uint kernel_pgs = 0;$/;"	l
 static	kernel.asm	/^static uint$/;"	l
 static	kernel.asm	/^static ushort *crt = (ushort*)P2V(0xb8000);  \/\/ CGA memory$/;"	l
 static	kernel.asm	/^static ushort irqmask = 0xFFFF & ~(1<<IRQ_SLAVE);$/;"	l
@@ -3630,6 +3636,7 @@ uint	echo.asm	/^uint$/;"	l
 uint	forktest.asm	/^uint$/;"	l
 uint	grep.asm	/^uint$/;"	l
 uint	init.asm	/^uint$/;"	l
+uint	kernel.asm	/^uint get_page_percentage(void) {$/;"	l
 uint	kernel.asm	/^uint ticks;$/;"	l
 uint	kill.asm	/^uint$/;"	l
 uint	ln.asm	/^uint$/;"	l
@@ -4185,6 +4192,7 @@ void	forktest.asm	/^void$/;"	l
 void	grep.asm	/^void$/;"	l
 void	init.asm	/^void$/;"	l
 void	kernel.asm	/^void cmostime(struct rtcdate *r)$/;"	l
+void	kernel.asm	/^void count_kernel_pgs(void) {$/;"	l
 void	kernel.asm	/^void nfu_update(void) {$/;"	l
 void	kernel.asm	/^void$/;"	l
 void	kill.asm	/^void$/;"	l
