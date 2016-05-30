@@ -399,7 +399,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   for(; a < newsz; a += PGSIZE){
 #ifndef SEL_NONE
     ++proc->pg_data.total_pgs;
-    if (proc->pg_data.ram_pgs == MAX_PSYC_PAGES) { // need to swap one out
+    if (proc->pg_data.ram_pgs >= MAX_PSYC_PAGES) { // need to swap one out
       swapout(pick_page());
     } else ++proc->pg_data.ram_pgs;
 #endif
@@ -445,7 +445,6 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       *pte = 0;
 #ifndef SEL_NONE
       if (proc != 0) {
-        --proc->pg_data.ram_pgs;
         rm_pg_metadata((char *) a);
       }
 #endif
@@ -578,7 +577,6 @@ swapin(uint va) { // fault address
   if(mem == 0)
     panic("kalloc failed in swapin");
   memset(mem, 0, PGSIZE);
-  cprintf("reading from index %d \n", pg->idx_swp);
   readFromSwapFile(proc, mem, pg->idx_swp * PGSIZE, PGSIZE);
   mappages(proc->pgdir, (void*) va, PGSIZE, (uint)v2p(mem), PTE_U | PTE_W);
   
@@ -596,7 +594,6 @@ pg_fault(void) {
   pde_t* pte;
   va = rcr2();
   pte = walkpgdir(proc->pgdir, (void *) va, 0);
-  cprintf("sdasdadad \n"); 
   if(!pte || !(*pte & PTE_PG)) {
     return 0;
   }
