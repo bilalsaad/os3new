@@ -124,12 +124,22 @@ growproc(int n)
 #ifndef SEL_NONE
 static void
 copy_swap_file(struct proc* src, struct proc* dst) {
-  char c;
+  char c[PGSIZE / 4];
   uint i = 0;
+  uint offset = 0;
+  struct pg* pg = src->pg_data.pgs;
   if (src->swapFile == 0) return;
-  while(readFromSwapFile(src, &c, i, sizeof(c)) > 0){
-    writeToSwapFile(dst, &c, i, sizeof(c));
-    ++i;
+  
+  while(pg != src->pg_data.pgs + MAX_TOTAL_PAGES) {
+    if (pg->state == DISK) {
+      for(i = 0; i < 4; ++i) {
+        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE/4);
+        readFromSwapFile(src, c, offset, PGSIZE/4);
+        if (i == 0) cprintf("%d \n", c[123]);
+        writeToSwapFile(dst, c, offset, PGSIZE/4);
+      }
+    }
+    ++pg;
   }
 }
 #endif
@@ -159,11 +169,7 @@ fork(void)
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
-#ifndef SEL_NONE
-  createSwapFile(np);
-  copy_swap_file(np, np->parent);
-  memmove(&np->pg_data, &np->parent->pg_data, sizeof(np->pg_data));
-#endif
+
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i])
       np->ofile[i] = filedup(proc->ofile[i]);
@@ -172,7 +178,14 @@ fork(void)
   safestrcpy(np->name, proc->name, sizeof(proc->name));
  
   pid = np->pid;
-
+#ifndef SEL_NONE
+  createSwapFile(np);
+  copy_swap_file(np->parent, np);
+  memmove(&np->pg_data, &np->parent->pg_data, sizeof(np->pg_data));
+  memmove(np->pg_data.pgs, np->parent->pg_data.pgs, NELEM(np->pg_data.pgs));
+  memmove(
+      np->pg_data.cells, np->parent->pg_data.cells, NELEM(np->pg_data.cells));
+#endif
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;
@@ -497,10 +510,12 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
+    cprintf("%d %s ", p->pid, state);
 #ifndef SEL_NONE
     print_page_stuff(p);
 #endif
-    cprintf("%d %s %s", p->pid, state, p->name);
+    cprintf(" %s", p->name);
+
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)
@@ -508,5 +523,7 @@ procdump(void)
     }
     cprintf("\n");
   }
-  cprintf("%d free pages in the system \n", get_page_percentage()); 
+#ifdef VER_TRUE
+  cprintf("%d\% free pages in the system \n", get_page_percentage()); 
+#endif
 }

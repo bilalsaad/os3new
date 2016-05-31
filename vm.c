@@ -335,7 +335,6 @@ swapout(struct pg* pg) {
     panic("swapout, address should exist \n");
   pg->state = DISK; 
   *pe = (*pe | PTE_PG) & ~PTE_P;
-  cprintf("called kfree with %p \n", (char*) p2v(PTE_ADDR(*pe)));
   kfree((char *) p2v(PTE_ADDR(*pe)));
   return 1;
 }
@@ -440,7 +439,6 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
     else if((*pte & PTE_P) != 0){
       pa = PTE_ADDR(*pte);
       if(pa == 0) {
-        d2;
         panic("kfree");
       }
       if (!(*pte & PTE_PG)) {
@@ -509,6 +507,7 @@ copyuvm(pde_t *pgdir, uint sz)
       panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
+    cprintf("ids %p \n", (void*) i);
 #ifndef SEL_NONE
     if (*pte & PTE_PG) { // the page is out out.
         if(mappages(d, (void*) i, PGSIZE, 0xfffff, flags) < 0)

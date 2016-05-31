@@ -9,7 +9,7 @@ char* m[COUNT];
   int
 main(int argc, char *argv[])
 {
-  int i = 0,j = 0, pid;
+  int i = 0,j = 0;
   char c = 'a';
   char cc[] = {0,0,0,0,0,0,0,0,0,0,0};
 
@@ -19,29 +19,23 @@ main(int argc, char *argv[])
     i++;
   }
   printf(1, "finsihed creating pages \n");
-  for(i = 0; i < COUNT; ++i) {
-    for(j = 0; j < PGSIZE; ++j) {
-      m[i][j] = c+10; 
-    }
-  }
   gets(cc, 10);
-  if ((pid = fork()) == 0) {
+  if (fork() == 0) {
     c = 'b';
   } 
-/*  for(i = 0; i < COUNT; ++i) {
+  for(i = 0; i < COUNT; ++i) {
     for(j = 0; j < PGSIZE; ++j) {
       m[i][j] = c; 
     }
-  }*/
+  }
   
   wait(); 
-  printf(1, "VALUES FOR %s \n", (pid == 0) ? "child" : "parent");
   for(i = 0; i < COUNT; ++i) {
-    printf(1, "page %d has value %c \n", i, m[i][120]);
+    printf(1, "page %d has value %c \n", i, m[i][0]);
   }
  
 
-  printf(1, "finished  %c!\n", c);
+  printf(1, "finished  %d!\n", c);
   gets(cc, 10);
   exit();
 }
