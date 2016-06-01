@@ -243,7 +243,7 @@ struct pg* pick_page(void) {
   
   dummy_min.ctime = INFINITY;
   for(;;) {
-    it = proc->pg_data.pgs;
+    it = proc->pg_data.pgs + 3;
     while(it != END) {
       if(it->state == RAM)
         min = min->ctime > it->ctime ? it : min;
@@ -447,8 +447,13 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       }
       *pte = 0;
 #ifndef SEL_NONE
-      if (proc != 0) {
+      // if this is aprocess freeing its own memory.
+      if (proc != 0 && pgdir == proc->pgdir) {
         rm_pg_metadata((char *) a);
+      }
+      // if it's a parent freeing his zombie kiddie we need do something else.
+      if(proc != 0 && pgdir != proc->pgdir) {
+        // An option is to ignore it. TODO(bilals) lambda
       }
 #endif
     }
@@ -494,7 +499,7 @@ pde_t*
 copyuvm(pde_t *pgdir, uint sz)
 {
   pde_t *d;
-  pte_t *pte;
+  pte_t *pte, *pg_pte;
   uint pa, i, flags;
   char *mem;
 
@@ -507,12 +512,14 @@ copyuvm(pde_t *pgdir, uint sz)
       panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
-    cprintf("ids %p \n", (void*) i);
 #ifndef SEL_NONE
     if (*pte & PTE_PG) { // the page is out out.
-        if(mappages(d, (void*) i, PGSIZE, 0xfffff, flags) < 0)
+        if(mappages(d, (void*)i, PGSIZE, 0x0, flags) < 0)
           goto bad;
-        *pte &= (~PTE_P);
+        // So we've mapped an entry for le page but! alas for this page is well
+        // paged out. So we must pewpew its present flag!. praise be to the lord
+        pg_pte = walkpgdir(d, (void*)i, 0); // yikes.
+        *pg_pte &= ~PTE_P;
         continue;
     }
 #endif
@@ -521,6 +528,7 @@ copyuvm(pde_t *pgdir, uint sz)
     memmove(mem, (char*)p2v(pa), PGSIZE);
     if(mappages(d, (void*)i, PGSIZE, v2p(mem), flags) < 0)
       goto bad;
+    pg_pte = walkpgdir(d, (void*)i, 0); // yikes.
   }
   return d;
 
@@ -571,7 +579,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 }
 #ifndef SEL_NONE
 static int
-swapin(uint va) { // fault address
+swapin(uint va) { //  fault address
   char* mem;
   struct pg* pg = find_pg(va);
   if(!pg)
@@ -596,9 +604,18 @@ int
 pg_fault(void) {
   uint va;
   pde_t* pte;
+  struct pg* pg;
+  char c[4];
   va = rcr2();
+  pg = find_pg(PTE_ADDR(va));
+  if(va == 0x4000){
+   readFromSwapFile(proc, c, pg->idx_swp * PGSIZE, sizeof(c));
+   cprintf("pid: %d <%d %d %d %d> \n", proc->pid, c[0], c[1], c[2], c[3]);
+  }
   pte = walkpgdir(proc->pgdir, (void *) va, 0);
+
   if(!pte || !(*pte & PTE_PG)) {
+    d2;
     return 0;
   }
   ++proc->pg_data.pg_faults;

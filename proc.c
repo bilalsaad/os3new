@@ -124,7 +124,8 @@ growproc(int n)
 #ifndef SEL_NONE
 static void
 copy_swap_file(struct proc* src, struct proc* dst) {
-  char c[PGSIZE / 4];
+  uint sz = 8;
+  char c[PGSIZE / sz];
   uint i = 0;
   uint offset = 0;
   struct pg* pg = src->pg_data.pgs;
@@ -132,17 +133,17 @@ copy_swap_file(struct proc* src, struct proc* dst) {
   
   while(pg != src->pg_data.pgs + MAX_TOTAL_PAGES) {
     if (pg->state == DISK) {
-      for(i = 0; i < 4; ++i) {
-        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE/4);
-        readFromSwapFile(src, c, offset, PGSIZE/4);
-        if (i == 0) cprintf("%d \n", c[123]);
-        writeToSwapFile(dst, c, offset, PGSIZE/4);
+      for(i = 0; i < sz; ++i) {
+        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE/sz);
+        readFromSwapFile(src, c, offset, PGSIZE/sz);
+        writeToSwapFile(dst, c, offset, PGSIZE/sz);
       }
     }
     ++pg;
   }
 }
 #endif
+
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -170,14 +171,6 @@ fork(void)
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
-  for(i = 0; i < NOFILE; i++)
-    if(proc->ofile[i])
-      np->ofile[i] = filedup(proc->ofile[i]);
-  np->cwd = idup(proc->cwd);
-
-  safestrcpy(np->name, proc->name, sizeof(proc->name));
- 
-  pid = np->pid;
 #ifndef SEL_NONE
   createSwapFile(np);
   copy_swap_file(np->parent, np);
@@ -186,11 +179,18 @@ fork(void)
   memmove(
       np->pg_data.cells, np->parent->pg_data.cells, NELEM(np->pg_data.cells));
 #endif
+  for(i = 0; i < NOFILE; i++)
+    if(proc->ofile[i])
+      np->ofile[i] = filedup(proc->ofile[i]);
+  np->cwd = idup(proc->cwd);
+
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
+ 
+  pid = np->pid;
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;
   release(&ptable.lock);
-  
   return pid;
 }
 
@@ -466,14 +466,17 @@ print_page_stuff(struct proc* p) {
   struct pg* p_iter = p->pg_data.pgs;
   int i = 0;
   int cts[3] = {0, 0, 0};
+  
   cprintf("\n");
+  if (p->pid < 2) return;
   while(p_iter && p_iter < p->pg_data.pgs + MAX_TOTAL_PAGES) {
     if(p_iter->state != PG_UNUSED) {
       cprintf("id %p ", p_iter->id);
       cprintf("state %s ", p_iter->state == PG_UNUSED? " UNUSED" :
-                           (p_iter->state == RAM ? " IN MEMORY" :
-                            (p_iter->state == DISK ? "ON SWAP FILE ":
+                           (p_iter->state == RAM ? " RAM" :
+                            (p_iter->state == DISK ? "DISK":
                              "???")));
+      cprintf("idx %d ", p_iter->idx_swp);
       cprintf("%d \n", i++);
     } 
     cts[p_iter->state]++;
