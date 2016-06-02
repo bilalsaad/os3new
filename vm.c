@@ -271,7 +271,7 @@ struct pg* pick_page(void) {
   dummy_min.ctime = INFINITY; 
   while(it != END) {
     if(it->state == RAM)
-      min = min->nfu_time > it->nfu_time ? it : min;
+      min = (min->nfu_time > it->nfu_time || min == &dummy_min) ? it : min;
     ++it; 
   }
   if (&dummy_min == min)
@@ -308,9 +308,9 @@ pick_page(void) {
   return it;
 }*/
 #endif
-int get_swap_cell(struct pg* pg) {
+int get_swap_cell(struct pg* pg, struct proc* p) {
   int i = 0;
-  struct swapfile_cell* cells = proc->pg_data.cells;
+  struct swapfile_cell* cells = p->pg_data.cells;
   while (i < MAX_TOTAL_PAGES) {                                                    
     if (!cells[i].taken) {                                                         
       cells[i].index = i;                                                          
@@ -329,8 +329,10 @@ swapout(struct pg* pg) {
   pde_t* pe;   // page table entry of the page we want to swapout
   uint va = pg->id;     // id of the page
   ++proc->pg_data.pg_swapouts;
-  if(writeToSwapFile(proc, (char *) va, get_swap_cell(pg) * PGSIZE, PGSIZE) < 0)
+  if(writeToSwapFile(
+        proc, (char *)va, get_swap_cell(pg, proc)*PGSIZE, PGSIZE) < 0) {
     panic("write to swap file faieled wdasdad ");
+  }
   if((pe = walkpgdir(proc->pgdir,(void *)  va, 0)) == 0)
     panic("swapout, address should exist \n");
   pg->state = DISK; 
@@ -514,10 +516,10 @@ copyuvm(pde_t *pgdir, uint sz)
     flags = PTE_FLAGS(*pte);
 #ifndef SEL_NONE
     if (*pte & PTE_PG) { // the page is out out.
-        if(mappages(d, (void*)i, PGSIZE, 0x0, flags) < 0)
+        if(mappages(d, (void*)i, PGSIZE, 0xFFFFF, flags) < 0)
           goto bad;
         // So we've mapped an entry for le page but! alas for this page is well
-        // paged out. So we must pewpew its present flag!. praise be to the lord
+        // paged out. So we must pewpew its present flag!.
         pg_pte = walkpgdir(d, (void*)i, 0); // yikes.
         *pg_pte &= ~PTE_P;
         continue;
@@ -608,7 +610,7 @@ pg_fault(void) {
   char c[4];
   va = rcr2();
   pg = find_pg(PTE_ADDR(va));
-  if(va == 0x4000){
+  if(0 && va == 0x4000){
    readFromSwapFile(proc, c, pg->idx_swp * PGSIZE, sizeof(c));
    cprintf("pid: %d <%d %d %d %d> \n", proc->pid, c[0], c[1], c[2], c[3]);
   }
@@ -624,6 +626,36 @@ pg_fault(void) {
   }
   return swapin(va);
 }
+void
+copy_swap_file(struct proc* src, struct proc* dst) {
+  uint sz = 1;
+  char c[PGSIZE / sz];
+  uint i = 0;
+  uint offset = 0;
+  int idx;
+  int read, write;
+  struct pg* pg = src->pg_data.pgs, *dpg= dst->pg_data.pgs;
+  memset(dst->pg_data.cells, 0, sizeof(dst->pg_data.cells));
+  if (src->swapFile == 0) return;
+    
+  while(pg != src->pg_data.pgs + MAX_TOTAL_PAGES) {
+    if (pg->state == DISK) {
+      for(i = 0; i < sz; ++i) {
+        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE/sz);
+        idx = get_swap_cell(dpg, dst);
+        idx = (dpg->idx_swp * PGSIZE) + (i * PGSIZE/sz);
+        cprintf("viva la pg %p idx_swp %d \n", dpg->id, dpg->idx_swp);
+        read = readFromSwapFile(src, c, offset, PGSIZE/sz);
+        write = writeToSwapFile(dst, c, idx, PGSIZE/sz);
+        
+        cprintf("read: %d -- write: %d \n", read, write);
+      }
+    }
+    ++pg;
+    ++dpg;
+  }
+} 
+
 #endif
 //PAGEBREAK!
 // Blank page.

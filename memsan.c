@@ -4,7 +4,7 @@
 #include "user.h"
 
 #define PGSIZE 4096
-#define COUNT  20
+#define COUNT 20 
 char* m[COUNT];
   int
 main(int argc, char *argv[])

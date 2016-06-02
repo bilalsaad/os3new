@@ -122,26 +122,37 @@ growproc(int n)
   return 0;
 }
 #ifndef SEL_NONE
+
+/*
 static void
 copy_swap_file(struct proc* src, struct proc* dst) {
-  uint sz = 8;
+  uint sz = 32;
   char c[PGSIZE / sz];
-  uint i = 0;
+  int i,j;
   uint offset = 0;
+  uint max_in = 15;
   struct pg* pg = src->pg_data.pgs;
   if (src->swapFile == 0) return;
-  
-  while(pg != src->pg_data.pgs + MAX_TOTAL_PAGES) {
-    if (pg->state == DISK) {
-      for(i = 0; i < sz; ++i) {
-        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE/sz);
-        readFromSwapFile(src, c, offset, PGSIZE/sz);
-        writeToSwapFile(dst, c, offset, PGSIZE/sz);
-      }
+  while(pg != src->pg_data.pgs) {
+    if(pg->state == DISK) {
+      cprintf("pg idx %d \n", pg->idx_swp);
+      max_in = max_in < pg->idx_swp ? pg->idx_swp : max_in;
     }
     ++pg;
   }
+  d2;
+  cprintf("max_in is %d \n", max_in);
+  for (i = 0; i < max_in; ++i) {
+    d2;
+    for(j = 0; j < sz; ++j) {
+      offset = (j * PGSIZE/sz);
+      readFromSwapFile(src, c, offset, PGSIZE/sz);
+      writeToSwapFile(dst, c, offset, PGSIZE/sz);
+    }
+  }
+
 }
+*/
 #endif
 
 // Create a new process copying p as the parent.
@@ -171,14 +182,6 @@ fork(void)
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
-#ifndef SEL_NONE
-  createSwapFile(np);
-  copy_swap_file(np->parent, np);
-  memmove(&np->pg_data, &np->parent->pg_data, sizeof(np->pg_data));
-  memmove(np->pg_data.pgs, np->parent->pg_data.pgs, NELEM(np->pg_data.pgs));
-  memmove(
-      np->pg_data.cells, np->parent->pg_data.cells, NELEM(np->pg_data.cells));
-#endif
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i])
       np->ofile[i] = filedup(proc->ofile[i]);
@@ -187,6 +190,14 @@ fork(void)
   safestrcpy(np->name, proc->name, sizeof(proc->name));
  
   pid = np->pid;
+#ifndef SEL_NONE
+  memmove(&np->pg_data, &np->parent->pg_data, sizeof(np->pg_data));
+  memmove(np->pg_data.pgs, np->parent->pg_data.pgs, NELEM(np->pg_data.pgs));
+  memmove(
+      np->pg_data.cells, np->parent->pg_data.cells, NELEM(np->pg_data.cells));
+  createSwapFile(np);
+  copy_swap_file(np->parent, np);
+#endif
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->state = RUNNABLE;

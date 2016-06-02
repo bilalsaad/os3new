@@ -26,7 +26,7 @@ C	kbd.h	32;"	d
 C	kernel.asm	/^#define C(x)  ((x)-'@')  \/\/ Control-x$/;"	d
 CAPSLOCK	kbd.h	13;"	d
 CC	Makefile	/^CC = $(TOOLPREFIX)gcc$/;"	m
-CFLAGS	Makefile	/^CFLAGS = -D SEL_$(SELECTION) -fno-pic -static -fno-builtin -fno-strict-aliasing -fvar-tracking -fvar-tracking-assignments -O0 -g -Wall -MD -gdwarf-2 -m32 -Werror -fno-omit-frame-pointer$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -D SEL_$(SELECTION) -D VER_$(VERBOSE_PRINT) -fno-pic -static -fno-builtin -fno-strict-aliasing -fvar-tracking -fvar-tracking-assignments -O0 -g -Wall -MD -gdwarf-2 -m32 -Werror -fno-omit-frame-pointer$/;"	m
 CMOS_PORT	lapic.c	134;"	d	file:
 CMOS_RETURN	lapic.c	135;"	d	file:
 CMOS_STATA	lapic.c	174;"	d	file:
@@ -37,7 +37,7 @@ CONSOLE	file.h	38;"	d
 CONV	kernel.asm	/^#define    CONV(x)     (t1.x = ((t1.x >> 4) * 10) + (t1.x & 0xf))$/;"	d
 CONV	lapic.c	225;"	d	file:
 CONV	lapic.c	232;"	d	file:
-COUNT	memsan.asm	/^#define COUNT  20 $/;"	d
+COUNT	memsan.asm	/^#define COUNT  15$/;"	d
 COUNT	memsan.c	7;"	d	file:
 CPUS	Makefile	/^CPUS := 2$/;"	m
 CR0_AM	mmu.h	35;"	d
@@ -82,6 +82,7 @@ Disassembly	mkdir.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	rm.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	sh.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	stressfs.asm	/^Disassembly of section .text:$/;"	l
+Disassembly	testfork.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	usertests.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	wc.asm	/^Disassembly of section .text:$/;"	l
 Disassembly	zombie.asm	/^Disassembly of section .text:$/;"	l
@@ -204,6 +205,8 @@ MPLINTR	mp.h	53;"	d
 MPPROC	mp.h	49;"	d
 N	forktest.asm	/^#define N  1000$/;"	d
 N	forktest.c	8;"	d	file:
+N	testfork.asm	/^#define N 13$/;"	d
+N	testfork.c	5;"	d	file:
 NBUF	param.h	12;"	d
 NCPU	param.h	3;"	d
 NDEV	param.h	7;"	d
@@ -237,7 +240,7 @@ PGADDR	mmu.h	118;"	d
 PGROUNDDOWN	mmu.h	130;"	d
 PGROUNDUP	mmu.h	129;"	d
 PGSHIFT	mmu.h	125;"	d
-PGSIZE	memsan.asm	/^#define PGSIZE 4096 $/;"	d
+PGSIZE	memsan.asm	/^#define PGSIZE 4096$/;"	d
 PGSIZE	memsan.c	6;"	d	file:
 PGSIZE	mmu.h	123;"	d
 PG_UNUSED	proc.h	/^enum pg_st {PG_UNUSED, RAM, DISK};$/;"	e	enum:pg_st
@@ -381,6 +384,7 @@ UPROGS	Makefile	/^UPROGS=\\$/;"	m
 V2P	memlayout.h	18;"	d
 V2P_WO	memlayout.h	21;"	d
 VER	lapic.c	14;"	d	file:
+VERBOSE_PRINT	Makefile	/^VERBOSE_PRINT = FALSE$/;"	m
 X1	lapic.c	32;"	d	file:
 YEAR	kernel.asm	/^#define YEAR    0x09$/;"	d
 YEAR	lapic.c	183;"	d	file:
@@ -399,6 +403,7 @@ _rm	rm.asm	/^_rm:     file format elf32-i386$/;"	l
 _sh	sh.asm	/^_sh:     file format elf32-i386$/;"	l
 _start	entry.S	/^_start = V2P_WO(entry)$/;"	d
 _stressfs	stressfs.asm	/^_stressfs:     file format elf32-i386$/;"	l
+_testfork	testfork.asm	/^_testfork:     file format elf32-i386$/;"	l
 _usertests	usertests.asm	/^_usertests:     file format elf32-i386$/;"	l
 _wc	wc.asm	/^_wc:     file format elf32-i386$/;"	l
 _zombie	zombie.asm	/^_zombie:     file format elf32-i386$/;"	l
@@ -424,12 +429,10 @@ a01	sh.asm	/^     a01:	83 ec 28             	sub    $0x28,%esp$/;"	l
 a02	ls.asm	/^ a02:	75 07                	jne    a0b <morecore+0x34>$/;"	l
 a02	usertests.asm	/^     a02:	00 $/;"	l
 a03	grep.asm	/^ a03:	83 7d f4 ff          	cmpl   $0xffffffff,-0xc(%ebp)$/;"	l
-a03	memsan.asm	/^ a03:	a1 08 0e 00 00       	mov    0xe08,%eax$/;"	l
 a03	usertests.asm	/^     a03:	c7 44 24 04 a0 8a 00 	movl   $0x8aa0,0x4(%esp)$/;"	l
 a04	ls.asm	/^ a04:	b8 00 00 00 00       	mov    $0x0,%eax$/;"	l
 a04	sh.asm	/^     a04:	c7 44 24 08 53 15 00 	movl   $0x1553,0x8(%esp)$/;"	l
 a07	grep.asm	/^ a07:	75 07                	jne    a10 <morecore+0x34>$/;"	l
-a08	memsan.asm	/^ a08:	a3 00 0e 00 00       	mov    %eax,0xe00$/;"	l
 a09	grep.asm	/^ a09:	b8 00 00 00 00       	mov    $0x0,%eax$/;"	l
 a09	ls.asm	/^ a09:	eb 22                	jmp    a2d <morecore+0x56>$/;"	l
 a0a	usertests.asm	/^     a0a:	00 $/;"	l
@@ -437,7 +440,6 @@ a0b	ls.asm	/^ a0b:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a0b	sh.asm	/^     a0b:	00 $/;"	l
 a0b	usertests.asm	/^     a0b:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a0c	sh.asm	/^     a0c:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
-a0d	memsan.asm	/^ a0d:	c7 05 04 0e 00 00 00 	movl   $0x0,0xe04$/;"	l
 a0e	grep.asm	/^ a0e:	eb 22                	jmp    a32 <morecore+0x56>$/;"	l
 a0e	ls.asm	/^ a0e:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
 a0e	usertests.asm	/^     a0e:	e8 c2 34 00 00       	call   3ed5 <write>$/;"	l
@@ -453,46 +455,38 @@ a13	grep.asm	/^ a13:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
 a13	sh.asm	/^     a13:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 a13	usertests.asm	/^     a13:	3d 09 04 00 00       	cmp    $0x409,%eax$/;"	l
 a14	ls.asm	/^ a14:	8b 55 08             	mov    0x8(%ebp),%edx$/;"	l
-a14	memsan.asm	/^ a14:	00 00 00 $/;"	l
 a16	grep.asm	/^ a16:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a16	sh.asm	/^     a16:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a17	ls.asm	/^ a17:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
-a17	memsan.asm	/^ a17:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a18	usertests.asm	/^     a18:	74 19                	je     a33 <pipe1+0xc0>$/;"	l
 a19	grep.asm	/^ a19:	8b 55 08             	mov    0x8(%ebp),%edx$/;"	l
 a19	sh.asm	/^     a19:	e8 5f fc ff ff       	call   67d <peek>$/;"	l
 a1a	ls.asm	/^ a1a:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
-a1a	memsan.asm	/^ a1a:	8b 00                	mov    (%eax),%eax$/;"	l
 a1a	usertests.asm	/^     a1a:	c7 44 24 04 85 48 00 	movl   $0x4885,0x4(%esp)$/;"	l
 a1c	grep.asm	/^ a1c:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
-a1c	memsan.asm	/^ a1c:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 a1d	ls.asm	/^ a1d:	83 c0 08             	add    $0x8,%eax$/;"	l
 a1e	sh.asm	/^     a1e:	85 c0                	test   %eax,%eax$/;"	l
 a1f	grep.asm	/^ a1f:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
-a1f	memsan.asm	/^ a1f:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a2	cat.asm	/^  a2:	8b 00                	mov    (%eax),%eax$/;"	l
 a2	grep.asm	/^  a2:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)$/;"	l
 a2	kill.asm	/^  a2:	8b 55 0c             	mov    0xc(%ebp),%edx$/;"	l
+a2	memsan.asm	/^  a2:	81 7c 24 18 ff 0f 00 	cmpl   $0xfff,0x18(%esp)$/;"	l
+a2	testfork.asm	/^  a2:	89 54 24 08          	mov    %edx,0x8(%esp)$/;"	l
 a2	zombie.asm	/^  a2:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 a20	ls.asm	/^ a20:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a20	sh.asm	/^     a20:	75 0c                	jne    a2e <parseblock+0x30>$/;"	l
 a21	usertests.asm	/^     a21:	00 $/;"	l
 a22	grep.asm	/^ a22:	83 c0 08             	add    $0x8,%eax$/;"	l
-a22	memsan.asm	/^ a22:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a22	sh.asm	/^     a22:	c7 04 24 55 15 00 00 	movl   $0x1555,(%esp)$/;"	l
 a22	usertests.asm	/^     a22:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 a23	ls.asm	/^ a23:	e8 ce fe ff ff       	call   8f6 <free>$/;"	l
 a25	grep.asm	/^ a25:	89 04 24             	mov    %eax,(%esp)$/;"	l
-a25	memsan.asm	/^ a25:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a28	grep.asm	/^ a28:	e8 ce fe ff ff       	call   8fb <free>$/;"	l
 a28	ls.asm	/^ a28:	a1 24 0e 00 00       	mov    0xe24,%eax$/;"	l
-a28	memsan.asm	/^ a28:	72 4d                	jb     a77 <malloc+0xa6>$/;"	l
 a29	sh.asm	/^     a29:	e8 29 f9 ff ff       	call   357 <panic>$/;"	l
 a29	usertests.asm	/^     a29:	e8 07 36 00 00       	call   4035 <printf>$/;"	l
-a2a	memsan.asm	/^ a2a:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a2d	grep.asm	/^ a2d:	a1 48 0e 00 00       	mov    0xe48,%eax$/;"	l
 a2d	ls.asm	/^ a2d:	c9                   	leave  $/;"	l
-a2d	memsan.asm	/^ a2d:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a2e	ls.asm	/^ a2e:	c3                   	ret    $/;"	l
 a2e	sh.asm	/^     a2e:	c7 44 24 0c 00 00 00 	movl   $0x0,0xc(%esp)$/;"	l
 a2e	usertests.asm	/^     a2e:	e8 82 34 00 00       	call   3eb5 <exit>$/;"	l
@@ -500,33 +494,26 @@ a2f	ls.asm	/^ a2f:	55                   	push   %ebp$/;"	l
 a3	mkdir.asm	/^  a3:	fc                   	cld    $/;"	l
 a3	rm.asm	/^  a3:	fc                   	cld    $/;"	l
 a30	ls.asm	/^ a30:	89 e5                	mov    %esp,%ebp$/;"	l
-a30	memsan.asm	/^ a30:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a32	grep.asm	/^ a32:	c9                   	leave  $/;"	l
 a32	ls.asm	/^ a32:	83 ec 28             	sub    $0x28,%esp$/;"	l
 a33	grep.asm	/^ a33:	c3                   	ret    $/;"	l
-a33	memsan.asm	/^ a33:	75 0c                	jne    a41 <malloc+0x70>$/;"	l
 a33	usertests.asm	/^     a33:	83 45 ec 01          	addl   $0x1,-0x14(%ebp)$/;"	l
 a34	grep.asm	/^ a34:	55                   	push   %ebp$/;"	l
 a35	grep.asm	/^ a35:	89 e5                	mov    %esp,%ebp$/;"	l
 a35	ls.asm	/^ a35:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
-a35	memsan.asm	/^ a35:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a35	sh.asm	/^     a35:	00 $/;"	l
 a36	sh.asm	/^     a36:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)$/;"	l
 a37	grep.asm	/^ a37:	83 ec 28             	sub    $0x28,%esp$/;"	l
 a37	usertests.asm	/^     a37:	83 7d ec 04          	cmpl   $0x4,-0x14(%ebp)$/;"	l
 a38	ls.asm	/^ a38:	83 c0 07             	add    $0x7,%eax$/;"	l
-a38	memsan.asm	/^ a38:	8b 10                	mov    (%eax),%edx$/;"	l
 a3a	grep.asm	/^ a3a:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
-a3a	memsan.asm	/^ a3a:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a3b	ls.asm	/^ a3b:	c1 e8 03             	shr    $0x3,%eax$/;"	l
 a3b	usertests.asm	/^     a3b:	7e 91                	jle    9ce <pipe1+0x5b>$/;"	l
 a3d	grep.asm	/^ a3d:	83 c0 07             	add    $0x7,%eax$/;"	l
-a3d	memsan.asm	/^ a3d:	89 10                	mov    %edx,(%eax)$/;"	l
 a3d	sh.asm	/^     a3d:	00 $/;"	l
 a3d	usertests.asm	/^     a3d:	e8 73 34 00 00       	call   3eb5 <exit>$/;"	l
 a3e	ls.asm	/^ a3e:	83 c0 01             	add    $0x1,%eax$/;"	l
 a3e	sh.asm	/^     a3e:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
-a3f	memsan.asm	/^ a3f:	eb 26                	jmp    a67 <malloc+0x96>$/;"	l
 a4	cat.asm	/^  a4:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)$/;"	l
 a4	echo.asm	/^  a4:	89 55 08             	mov    %edx,0x8(%ebp)$/;"	l
 a4	ln.asm	/^  a4:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
@@ -535,31 +522,24 @@ a4	rm.asm	/^  a4:	f3 aa                	rep stos %al,%es:(%edi)$/;"	l
 a4	sh.asm	/^      a4:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a40	grep.asm	/^ a40:	c1 e8 03             	shr    $0x3,%eax$/;"	l
 a41	ls.asm	/^ a41:	89 45 ec             	mov    %eax,-0x14(%ebp)$/;"	l
-a41	memsan.asm	/^ a41:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a41	sh.asm	/^     a41:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 a42	usertests.asm	/^     a42:	83 7d e0 00          	cmpl   $0x0,-0x20(%ebp)$/;"	l
 a43	grep.asm	/^ a43:	83 c0 01             	add    $0x1,%eax$/;"	l
 a44	ls.asm	/^ a44:	a1 24 0e 00 00       	mov    0xe24,%eax$/;"	l
-a44	memsan.asm	/^ a44:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a45	sh.asm	/^     a45:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 a46	grep.asm	/^ a46:	89 45 ec             	mov    %eax,-0x14(%ebp)$/;"	l
 a46	usertests.asm	/^     a46:	0f 8e f9 00 00 00    	jle    b45 <pipe1+0x1d2>$/;"	l
-a47	memsan.asm	/^ a47:	2b 45 ec             	sub    -0x14(%ebp),%eax$/;"	l
 a48	sh.asm	/^     a48:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a49	grep.asm	/^ a49:	a1 48 0e 00 00       	mov    0xe48,%eax$/;"	l
 a49	ls.asm	/^ a49:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
-a4a	memsan.asm	/^ a4a:	89 c2                	mov    %eax,%edx$/;"	l
 a4b	sh.asm	/^     a4b:	e8 e2 fa ff ff       	call   532 <gettoken>$/;"	l
 a4c	ls.asm	/^ a4c:	83 7d f0 00          	cmpl   $0x0,-0x10(%ebp)$/;"	l
-a4c	memsan.asm	/^ a4c:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a4c	usertests.asm	/^     a4c:	8b 45 dc             	mov    -0x24(%ebp),%eax$/;"	l
 a4e	grep.asm	/^ a4e:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
-a4f	memsan.asm	/^ a4f:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
 a4f	usertests.asm	/^     a4f:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a5	forktest.asm	/^  a5:	85 c0                	test   %eax,%eax$/;"	l
 a5	kill.asm	/^  a5:	8d 4a 01             	lea    0x1(%edx),%ecx$/;"	l
 a5	ls.asm	/^  a5:	b8 0c 0e 00 00       	mov    $0xe0c,%eax$/;"	l
-a5	memsan.asm	/^  a5:	00 $/;"	l
 a5	stressfs.asm	/^  a5:	0f b6 84 24 26 02 00 	movzbl 0x226(%esp),%eax$/;"	l
 a5	usertests.asm	/^      a5:	85 c0                	test   %eax,%eax$/;"	l
 a5	wc.asm	/^  a5:	89 45 e0             	mov    %eax,-0x20(%ebp)$/;"	l
@@ -568,45 +548,35 @@ a50	ls.asm	/^ a50:	75 23                	jne    a75 <malloc+0x46>$/;"	l
 a50	sh.asm	/^     a50:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 a51	grep.asm	/^ a51:	83 7d f0 00          	cmpl   $0x0,-0x10(%ebp)$/;"	l
 a52	ls.asm	/^ a52:	c7 45 f0 1c 0e 00 00 	movl   $0xe1c,-0x10(%ebp)$/;"	l
-a52	memsan.asm	/^ a52:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a52	usertests.asm	/^     a52:	e8 86 34 00 00       	call   3edd <close>$/;"	l
 a53	sh.asm	/^     a53:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 a55	grep.asm	/^ a55:	75 23                	jne    a7a <malloc+0x46>$/;"	l
-a55	memsan.asm	/^ a55:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a57	grep.asm	/^ a57:	c7 45 f0 40 0e 00 00 	movl   $0xe40,-0x10(%ebp)$/;"	l
 a57	sh.asm	/^     a57:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 a57	usertests.asm	/^     a57:	c7 45 e4 00 00 00 00 	movl   $0x0,-0x1c(%ebp)$/;"	l
-a58	memsan.asm	/^ a58:	c1 e0 03             	shl    $0x3,%eax$/;"	l
 a59	ls.asm	/^ a59:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a5a	sh.asm	/^     a5a:	89 04 24             	mov    %eax,(%esp)$/;"	l
-a5b	memsan.asm	/^ a5b:	01 45 f4             	add    %eax,-0xc(%ebp)$/;"	l
 a5c	ls.asm	/^ a5c:	a3 24 0e 00 00       	mov    %eax,0xe24$/;"	l
 a5d	sh.asm	/^     a5d:	e8 1c fd ff ff       	call   77e <parseline>$/;"	l
 a5e	grep.asm	/^ a5e:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
-a5e	memsan.asm	/^ a5e:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a5e	usertests.asm	/^     a5e:	c7 45 e8 01 00 00 00 	movl   $0x1,-0x18(%ebp)$/;"	l
 a6	init.asm	/^  a6:	83 7c 24 1c 00       	cmpl   $0x0,0x1c(%esp)$/;"	l
-a6	memsan.asm	/^  a6:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 a6	mkdir.asm	/^  a6:	89 ca                	mov    %ecx,%edx$/;"	l
 a6	rm.asm	/^  a6:	89 ca                	mov    %ecx,%edx$/;"	l
+a6	testfork.asm	/^  a6:	c7 44 24 04 24 09 00 	movl   $0x924,0x4(%esp)$/;"	l
 a61	grep.asm	/^ a61:	a3 48 0e 00 00       	mov    %eax,0xe48$/;"	l
 a61	ls.asm	/^ a61:	a1 24 0e 00 00       	mov    0xe24,%eax$/;"	l
-a61	memsan.asm	/^ a61:	8b 55 ec             	mov    -0x14(%ebp),%edx$/;"	l
 a62	sh.asm	/^     a62:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
-a64	memsan.asm	/^ a64:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
 a65	sh.asm	/^     a65:	c7 44 24 08 60 15 00 	movl   $0x1560,0x8(%esp)$/;"	l
 a65	usertests.asm	/^     a65:	eb 68                	jmp    acf <pipe1+0x15c>$/;"	l
 a66	grep.asm	/^ a66:	a1 48 0e 00 00       	mov    0xe48,%eax$/;"	l
 a66	ls.asm	/^ a66:	a3 1c 0e 00 00       	mov    %eax,0xe1c$/;"	l
-a67	memsan.asm	/^ a67:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a67	usertests.asm	/^     a67:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)$/;"	l
-a6a	memsan.asm	/^ a6a:	a3 08 0e 00 00       	mov    %eax,0xe08$/;"	l
 a6b	grep.asm	/^ a6b:	a3 40 0e 00 00       	mov    %eax,0xe40$/;"	l
 a6b	ls.asm	/^ a6b:	c7 05 20 0e 00 00 00 	movl   $0x0,0xe20$/;"	l
 a6c	sh.asm	/^     a6c:	00 $/;"	l
 a6d	sh.asm	/^     a6d:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 a6e	usertests.asm	/^     a6e:	eb 3d                	jmp    aad <pipe1+0x13a>$/;"	l
-a6f	memsan.asm	/^ a6f:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a7	echo.asm	/^  a7:	8b 55 0c             	mov    0xc(%ebp),%edx$/;"	l
 a7	forktest.asm	/^  a7:	79 19                	jns    c2 <forktest+0x99>$/;"	l
 a7	ln.asm	/^  a7:	89 45 fc             	mov    %eax,-0x4(%ebp)$/;"	l
@@ -616,13 +586,10 @@ a70	grep.asm	/^ a70:	c7 05 44 0e 00 00 00 	movl   $0x0,0xe44$/;"	l
 a70	sh.asm	/^     a70:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 a70	usertests.asm	/^     a70:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a72	ls.asm	/^ a72:	00 00 00 $/;"	l
-a72	memsan.asm	/^ a72:	83 c0 08             	add    $0x8,%eax$/;"	l
 a73	usertests.asm	/^     a73:	05 a0 8a 00 00       	add    $0x8aa0,%eax$/;"	l
 a74	sh.asm	/^     a74:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 a75	ls.asm	/^ a75:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
-a75	memsan.asm	/^ a75:	eb 38                	jmp    aaf <malloc+0xde>$/;"	l
 a77	grep.asm	/^ a77:	00 00 00 $/;"	l
-a77	memsan.asm	/^ a77:	a1 08 0e 00 00       	mov    0xe08,%eax$/;"	l
 a77	sh.asm	/^     a77:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a78	ls.asm	/^ a78:	8b 00                	mov    (%eax),%eax$/;"	l
 a78	usertests.asm	/^     a78:	0f b6 00             	movzbl (%eax),%eax$/;"	l
@@ -630,12 +597,10 @@ a7a	grep.asm	/^ a7a:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a7a	ls.asm	/^ a7a:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 a7a	sh.asm	/^     a7a:	e8 fe fb ff ff       	call   67d <peek>$/;"	l
 a7b	usertests.asm	/^     a7b:	0f be c8             	movsbl %al,%ecx$/;"	l
-a7c	memsan.asm	/^ a7c:	39 45 f4             	cmp    %eax,-0xc(%ebp)$/;"	l
 a7d	grep.asm	/^ a7d:	8b 00                	mov    (%eax),%eax$/;"	l
 a7d	ls.asm	/^ a7d:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a7e	usertests.asm	/^     a7e:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a7f	grep.asm	/^ a7f:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
-a7f	memsan.asm	/^ a7f:	75 1b                	jne    a9c <malloc+0xcb>$/;"	l
 a7f	sh.asm	/^     a7f:	85 c0                	test   %eax,%eax$/;"	l
 a8	kill.asm	/^  a8:	89 4d 0c             	mov    %ecx,0xc(%ebp)$/;"	l
 a8	mkdir.asm	/^  a8:	89 fb                	mov    %edi,%ebx$/;"	l
@@ -643,17 +608,14 @@ a8	rm.asm	/^  a8:	89 fb                	mov    %edi,%ebx$/;"	l
 a8	wc.asm	/^  a8:	83 7d e0 00          	cmpl   $0x0,-0x20(%ebp)$/;"	l
 a8	zombie.asm	/^  a8:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 a80	ls.asm	/^ a80:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
-a81	memsan.asm	/^ a81:	8b 45 ec             	mov    -0x14(%ebp),%eax$/;"	l
 a81	sh.asm	/^     a81:	75 0c                	jne    a8f <parseblock+0x91>$/;"	l
 a81	usertests.asm	/^     a81:	8d 50 01             	lea    0x1(%eax),%edx$/;"	l
 a82	grep.asm	/^ a82:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a83	ls.asm	/^ a83:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a83	sh.asm	/^     a83:	c7 04 24 62 15 00 00 	movl   $0x1562,(%esp)$/;"	l
-a84	memsan.asm	/^ a84:	89 04 24             	mov    %eax,(%esp)$/;"	l
 a84	usertests.asm	/^     a84:	89 55 f4             	mov    %edx,-0xc(%ebp)$/;"	l
 a85	grep.asm	/^ a85:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a86	ls.asm	/^ a86:	72 4d                	jb     ad5 <malloc+0xa6>$/;"	l
-a87	memsan.asm	/^ a87:	e8 ed fe ff ff       	call   979 <morecore>$/;"	l
 a87	usertests.asm	/^     a87:	31 c8                	xor    %ecx,%eax$/;"	l
 a88	grep.asm	/^ a88:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a88	ls.asm	/^ a88:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
@@ -661,23 +623,20 @@ a89	usertests.asm	/^     a89:	0f b6 c0             	movzbl %al,%eax$/;"	l
 a8a	sh.asm	/^     a8a:	e8 c8 f8 ff ff       	call   357 <panic>$/;"	l
 a8b	grep.asm	/^ a8b:	72 4d                	jb     ada <malloc+0xa6>$/;"	l
 a8b	ls.asm	/^ a8b:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
-a8c	memsan.asm	/^ a8c:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 a8c	usertests.asm	/^     a8c:	85 c0                	test   %eax,%eax$/;"	l
 a8d	grep.asm	/^ a8d:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a8e	ls.asm	/^ a8e:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a8e	usertests.asm	/^     a8e:	74 19                	je     aa9 <pipe1+0x136>$/;"	l
-a8f	memsan.asm	/^ a8f:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)$/;"	l
 a8f	sh.asm	/^     a8f:	c7 44 24 0c 00 00 00 	movl   $0x0,0xc(%esp)$/;"	l
 a9	forktest.asm	/^  a9:	c7 44 24 04 4b 04 00 	movl   $0x44b,0x4(%esp)$/;"	l
 a9	grep.asm	/^  a9:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)$/;"	l
+a9	memsan.asm	/^  a9:	00 $/;"	l
 a9	usertests.asm	/^      a9:	a1 c4 62 00 00       	mov    0x62c4,%eax$/;"	l
 a90	grep.asm	/^ a90:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
 a90	usertests.asm	/^     a90:	c7 44 24 04 93 48 00 	movl   $0x4893,0x4(%esp)$/;"	l
 a91	ls.asm	/^ a91:	75 0c                	jne    a9f <malloc+0x70>$/;"	l
 a93	grep.asm	/^ a93:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 a93	ls.asm	/^ a93:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-a93	memsan.asm	/^ a93:	75 07                	jne    a9c <malloc+0xcb>$/;"	l
-a95	memsan.asm	/^ a95:	b8 00 00 00 00       	mov    $0x0,%eax$/;"	l
 a96	grep.asm	/^ a96:	75 0c                	jne    aa4 <malloc+0x70>$/;"	l
 a96	ls.asm	/^ a96:	8b 10                	mov    (%eax),%edx$/;"	l
 a96	sh.asm	/^     a96:	00 $/;"	l
@@ -686,53 +645,45 @@ a97	usertests.asm	/^     a97:	00 $/;"	l
 a98	grep.asm	/^ a98:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a98	ls.asm	/^ a98:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a98	usertests.asm	/^     a98:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
-a9a	memsan.asm	/^ a9a:	eb 13                	jmp    aaf <malloc+0xde>$/;"	l
 a9b	grep.asm	/^ a9b:	8b 10                	mov    (%eax),%edx$/;"	l
 a9b	ls.asm	/^ a9b:	89 10                	mov    %edx,(%eax)$/;"	l
-a9c	memsan.asm	/^ a9c:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 a9d	grep.asm	/^ a9d:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 a9d	ls.asm	/^ a9d:	eb 26                	jmp    ac5 <malloc+0x96>$/;"	l
 a9e	sh.asm	/^     a9e:	00 $/;"	l
 a9f	ls.asm	/^ a9f:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-a9f	memsan.asm	/^ a9f:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
 a9f	sh.asm	/^     a9f:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 a9f	usertests.asm	/^     a9f:	e8 91 35 00 00       	call   4035 <printf>$/;"	l
 aa	echo.asm	/^  aa:	8d 4a 01             	lea    0x1(%edx),%ecx$/;"	l
 aa	ln.asm	/^  aa:	90                   	nop$/;"	l
 aa	ls.asm	/^  aa:	83 c4 24             	add    $0x24,%esp$/;"	l
+aa	memsan.asm	/^  aa:	7e d6                	jle    82 <main+0x82>$/;"	l
 aa	mkdir.asm	/^  aa:	89 5d 08             	mov    %ebx,0x8(%ebp)$/;"	l
 aa	rm.asm	/^  aa:	89 5d 08             	mov    %ebx,0x8(%ebp)$/;"	l
 aa0	grep.asm	/^ aa0:	89 10                	mov    %edx,(%eax)$/;"	l
 aa2	grep.asm	/^ aa2:	eb 26                	jmp    aca <malloc+0x96>$/;"	l
 aa2	ls.asm	/^ aa2:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
-aa2	memsan.asm	/^ aa2:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 aa2	sh.asm	/^     aa2:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 aa4	grep.asm	/^ aa4:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 aa4	usertests.asm	/^     aa4:	e9 b5 00 00 00       	jmp    b5e <pipe1+0x1eb>$/;"	l
 aa5	ls.asm	/^ aa5:	2b 45 ec             	sub    -0x14(%ebp),%eax$/;"	l
-aa5	memsan.asm	/^ aa5:	8b 00                	mov    (%eax),%eax$/;"	l
 aa6	sh.asm	/^     aa6:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 aa7	grep.asm	/^ aa7:	8b 40 04             	mov    0x4(%eax),%eax$/;"	l
-aa7	memsan.asm	/^ aa7:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 aa8	ls.asm	/^ aa8:	89 c2                	mov    %eax,%edx$/;"	l
 aa9	sh.asm	/^     aa9:	89 04 24             	mov    %eax,(%esp)$/;"	l
 aa9	usertests.asm	/^     aa9:	83 45 f0 01          	addl   $0x1,-0x10(%ebp)$/;"	l
 aaa	grep.asm	/^ aaa:	2b 45 ec             	sub    -0x14(%ebp),%eax$/;"	l
 aaa	ls.asm	/^ aaa:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-aaa	memsan.asm	/^ aaa:	e9 70 ff ff ff       	jmp    a1f <malloc+0x4e>$/;"	l
 aac	sh.asm	/^     aac:	e8 81 fa ff ff       	call   532 <gettoken>$/;"	l
 aad	grep.asm	/^ aad:	89 c2                	mov    %eax,%edx$/;"	l
 aad	ls.asm	/^ aad:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
 aad	usertests.asm	/^     aad:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 aaf	grep.asm	/^ aaf:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-aaf	memsan.asm	/^ aaf:	c9                   	leave  $/;"	l
 ab	cat.asm	/^  ab:	00 $/;"	l
 ab	init.asm	/^  ab:	75 2d                	jne    da <main+0xda>$/;"	l
 ab	kill.asm	/^  ab:	0f b6 12             	movzbl (%edx),%edx$/;"	l
 ab	ln.asm	/^  ab:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 ab	zombie.asm	/^  ab:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 ab0	ls.asm	/^ ab0:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-ab0	memsan.asm	/^ ab0:	c3                   	ret    $/;"	l
 ab0	usertests.asm	/^     ab0:	3b 45 ec             	cmp    -0x14(%ebp),%eax$/;"	l
 ab1	sh.asm	/^     ab1:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 ab2	grep.asm	/^ ab2:	89 50 04             	mov    %edx,0x4(%eax)$/;"	l
@@ -755,6 +706,7 @@ abe	usertests.asm	/^     abe:	8b 45 e8             	mov    -0x18(%ebp),%eax$/;"	
 abf	ls.asm	/^ abf:	8b 55 ec             	mov    -0x14(%ebp),%edx$/;"	l
 abf	sh.asm	/^     abf:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 ac	cat.asm	/^  ac:	89 04 24             	mov    %eax,(%esp)$/;"	l
+ac	memsan.asm	/^  ac:	83 44 24 1c 01       	addl   $0x1,0x1c(%esp)$/;"	l
 ac	sh.asm	/^      ac:	85 c0                	test   %eax,%eax$/;"	l
 ac	stressfs.asm	/^  ac:	00 $/;"	l
 ac	wc.asm	/^  ac:	0f 8f 70 ff ff ff    	jg     22 <wc+0x22>$/;"	l
@@ -780,10 +732,10 @@ ad	echo.asm	/^  ad:	89 4d 0c             	mov    %ecx,0xc(%ebp)$/;"	l
 ad	grep.asm	/^  ad:	7e 29                	jle    d8 <grep+0xd8>$/;"	l
 ad	init.asm	/^  ad:	c7 44 24 04 60 0b 00 	movl   $0xb60,0x4(%esp)$/;"	l
 ad	ls.asm	/^  ad:	5b                   	pop    %ebx$/;"	l
-ad	memsan.asm	/^  ad:	e8 33 06 00 00       	call   6e5 <printf>$/;"	l
 ad	mkdir.asm	/^  ad:	89 55 10             	mov    %edx,0x10(%ebp)$/;"	l
 ad	rm.asm	/^  ad:	89 55 10             	mov    %edx,0x10(%ebp)$/;"	l
 ad	stressfs.asm	/^  ad:	89 c2                	mov    %eax,%edx$/;"	l
+ad	testfork.asm	/^  ad:	00 $/;"	l
 ad0	ls.asm	/^ ad0:	83 c0 08             	add    $0x8,%eax$/;"	l
 ad0	sh.asm	/^     ad0:	c9                   	leave  $/;"	l
 ad1	sh.asm	/^     ad1:	c3                   	ret    $/;"	l
@@ -815,6 +767,7 @@ ae	kill.asm	/^  ae:	88 10                	mov    %dl,(%eax)$/;"	l
 ae	ln.asm	/^  ae:	8d 50 01             	lea    0x1(%eax),%edx$/;"	l
 ae	ls.asm	/^  ae:	5d                   	pop    %ebp$/;"	l
 ae	sh.asm	/^      ae:	79 23                	jns    d3 <runcmd+0xd3>$/;"	l
+ae	testfork.asm	/^  ae:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 ae	usertests.asm	/^      ae:	c7 44 24 04 78 44 00 	movl   $0x4478,0x4(%esp)$/;"	l
 ae	zombie.asm	/^  ae:	0f b6 c0             	movzbl %al,%eax$/;"	l
 ae0	sh.asm	/^     ae0:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
@@ -877,6 +830,7 @@ ap	mkdir.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	rm.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	sh.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	stressfs.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
+ap	testfork.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	usertests.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	wc.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
 ap	zombie.asm	/^  ap = (uint*)(void*)&fmt + 1;$/;"	d
@@ -927,6 +881,7 @@ b0e	usertests.asm	/^     b0e:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 b1	forktest.asm	/^  b1:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 b1	ln.asm	/^  b1:	89 55 08             	mov    %edx,0x8(%ebp)$/;"	l
 b1	ls.asm	/^  b1:	89 e5                	mov    %esp,%ebp$/;"	l
+b1	memsan.asm	/^  b1:	83 7c 24 1c 0e       	cmpl   $0xe,0x1c(%esp)$/;"	l
 b1	mkdir.asm	/^  b1:	5f                   	pop    %edi$/;"	l
 b1	rm.asm	/^  b1:	5f                   	pop    %edi$/;"	l
 b1	zombie.asm	/^  b1:	29 c2                	sub    %eax,%edx$/;"	l
@@ -939,7 +894,6 @@ b18	sh.asm	/^     b18:	89 45 ec             	mov    %eax,-0x14(%ebp)$/;"	l
 b1a	usertests.asm	/^     b1a:	e8 96 33 00 00       	call   3eb5 <exit>$/;"	l
 b1b	sh.asm	/^     b1b:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)$/;"	l
 b1f	usertests.asm	/^     b1f:	8b 45 d8             	mov    -0x28(%ebp),%eax$/;"	l
-b2	memsan.asm	/^  b2:	c7 44 24 04 0a 00 00 	movl   $0xa,0x4(%esp)$/;"	l
 b2	mkdir.asm	/^  b2:	5d                   	pop    %ebp$/;"	l
 b2	rm.asm	/^  b2:	5d                   	pop    %ebp$/;"	l
 b2	wc.asm	/^  b2:	83 7d e0 00          	cmpl   $0x0,-0x20(%ebp)$/;"	l
@@ -987,6 +941,7 @@ b5	kill.asm	/^  b5:	75 e2                	jne    99 <strcpy+0xd>$/;"	l
 b5	ls.asm	/^  b5:	53                   	push   %ebx$/;"	l
 b5	mkdir.asm	/^  b5:	89 e5                	mov    %esp,%ebp$/;"	l
 b5	rm.asm	/^  b5:	89 e5                	mov    %esp,%ebp$/;"	l
+b5	testfork.asm	/^  b5:	e8 5d 04 00 00       	call   517 <printf>$/;"	l
 b5	usertests.asm	/^      b5:	00 $/;"	l
 b5	zombie.asm	/^  b5:	5d                   	pop    %ebp$/;"	l
 b51	sh.asm	/^     b51:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
@@ -999,6 +954,7 @@ b5e	sh.asm	/^     b5e:	e8 cf f9 ff ff       	call   532 <gettoken>$/;"	l
 b5e	usertests.asm	/^     b5e:	c9                   	leave  $/;"	l
 b5f	usertests.asm	/^     b5f:	c3                   	ret    $/;"	l
 b6	ls.asm	/^  b6:	81 ec 5c 02 00 00    	sub    $0x25c,%esp$/;"	l
+b6	memsan.asm	/^  b6:	7e c0                	jle    78 <main+0x78>$/;"	l
 b6	sh.asm	/^      b6:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
 b6	stressfs.asm	/^  b6:	01 d0                	add    %edx,%eax$/;"	l
 b6	usertests.asm	/^      b6:	89 04 24             	mov    %eax,(%esp)$/;"	l
@@ -1030,6 +986,7 @@ b7f	usertests.asm	/^     b7f:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 b8	cat.asm	/^  b8:	83 7c 24 18 00       	cmpl   $0x0,0x18(%esp)$/;"	l
 b8	echo.asm	/^  b8:	84 c0                	test   %al,%al$/;"	l
 b8	forktest.asm	/^  b8:	e8 43 ff ff ff       	call   0 <printf>$/;"	l
+b8	memsan.asm	/^  b8:	c7 44 24 04 48 09 00 	movl   $0x948,0x4(%esp)$/;"	l
 b8	stressfs.asm	/^  b8:	88 84 24 26 02 00 00 	mov    %al,0x226(%esp)$/;"	l
 b8	wc.asm	/^  b8:	c7 44 24 04 93 09 00 	movl   $0x993,0x4(%esp)$/;"	l
 b8	zombie.asm	/^  b8:	89 e5                	mov    %esp,%ebp$/;"	l
@@ -1043,7 +1000,6 @@ b8a	usertests.asm	/^     b8a:	e8 1e 33 00 00       	call   3ead <fork>$/;"	l
 b8c	sh.asm	/^     b8c:	89 4c 90 04          	mov    %ecx,0x4(%eax,%edx,4)$/;"	l
 b8f	usertests.asm	/^     b8f:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	l
 b9	grep.asm	/^  b9:	89 d0                	mov    %edx,%eax$/;"	l
-b9	memsan.asm	/^  b9:	00 $/;"	l
 b9	usertests.asm	/^      b9:	e8 77 3f 00 00       	call   4035 <printf>$/;"	l
 b90	sh.asm	/^     b90:	8b 55 e0             	mov    -0x20(%ebp),%edx$/;"	l
 b92	usertests.asm	/^     b92:	83 7d f0 00          	cmpl   $0x0,-0x10(%ebp)$/;"	l
@@ -1058,10 +1014,10 @@ b9d	usertests.asm	/^     b9d:	89 04 24             	mov    %eax,(%esp)$/;"	l
 ba	echo.asm	/^  ba:	75 e2                	jne    9e <strcpy+0xd>$/;"	l
 ba	kill.asm	/^  ba:	c9                   	leave  $/;"	l
 ba	ln.asm	/^  ba:	89 4d 0c             	mov    %ecx,0xc(%ebp)$/;"	l
-ba	memsan.asm	/^  ba:	8d 44 24 1c          	lea    0x1c(%esp),%eax$/;"	l
 ba	mkdir.asm	/^  ba:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 ba	rm.asm	/^  ba:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 ba	sh.asm	/^      ba:	c7 44 24 04 c7 14 00 	movl   $0x14c7,0x4(%esp)$/;"	l
+ba	testfork.asm	/^  ba:	83 44 24 4c 01       	addl   $0x1,0x4c(%esp)$/;"	l
 ba	zombie.asm	/^  ba:	83 ec 10             	sub    $0x10,%esp$/;"	l
 ba0	sh.asm	/^     ba0:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)$/;"	l
 ba0	usertests.asm	/^     ba0:	e8 20 33 00 00       	call   3ec5 <pipe>$/;"	l
@@ -1130,7 +1086,6 @@ bdc	usertests.asm	/^     bdc:	74 14                	je     bf2 <preempt+0x92>$/;
 bdd	sh.asm	/^     bdd:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 bde	usertests.asm	/^     bde:	c7 44 24 04 dd 48 00 	movl   $0x48dd,0x4(%esp)$/;"	l
 be	grep.asm	/^  be:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
-be	memsan.asm	/^  be:	89 04 24             	mov    %eax,(%esp)$/;"	l
 be	usertests.asm	/^      be:	e8 f2 3d 00 00       	call   3eb5 <exit>$/;"	l
 be1	sh.asm	/^     be1:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 be4	sh.asm	/^     be4:	89 04 24             	mov    %eax,(%esp)$/;"	l
@@ -1144,7 +1099,9 @@ begin_op	log.c	/^begin_op(void)$/;"	f
 bf	cat.asm	/^  bf:	8b 44 24 1c          	mov    0x1c(%esp),%eax$/;"	l
 bf	echo.asm	/^  bf:	c9                   	leave  $/;"	l
 bf	kill.asm	/^  bf:	eb 08                	jmp    c9 <strcmp+0xd>$/;"	l
+bf	memsan.asm	/^  bf:	00 $/;"	l
 bf	stressfs.asm	/^  bf:	c7 44 24 04 02 02 00 	movl   $0x202,0x4(%esp)$/;"	l
+bf	testfork.asm	/^  bf:	83 7c 24 4c 0c       	cmpl   $0xc,0x4c(%esp)$/;"	l
 bf	wc.asm	/^  bf:	00 $/;"	l
 bf2	usertests.asm	/^     bf2:	8b 45 e8             	mov    -0x18(%ebp),%eax$/;"	l
 bf4	sh.asm	/^     bf4:	8b 45 ec             	mov    -0x14(%ebp),%eax$/;"	l
@@ -1190,6 +1147,7 @@ bp	mkdir.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	rm.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	sh.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	stressfs.asm	/^  bp = (Header*)ap - 1;$/;"	d
+bp	testfork.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	usertests.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	wc.asm	/^  bp = (Header*)ap - 1;$/;"	d
 bp	zombie.asm	/^  bp = (Header*)ap - 1;$/;"	d
@@ -1220,6 +1178,7 @@ c	kernel.asm	/^  c = charcode[shift & (CTL | SHIFT)][data];$/;"	d
 c	kill.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	ln.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	ls.asm	/^    c = fmt[i] & 0xff;$/;"	d
+c	memsan.asm	/^    c = 'b';$/;"	d
 c	memsan.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	mkdir.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	rm.asm	/^    c = fmt[i] & 0xff;$/;"	d
@@ -1227,6 +1186,7 @@ c	sh.asm	/^       c:	e8 50 0f 00 00       	call   f61 <exit>$/;"	l
 c	sh.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	stressfs.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	stressfs.asm	/^   c:	c7 84 24 1e 02 00 00 	movl   $0x65727473,0x21e(%esp)$/;"	l
+c	testfork.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	usertests.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	usertests.asm	/^  c = sbrk(-(sbrk(0) - oldbrk));$/;"	d
 c	usertests.asm	/^  c = sbrk(-4096);$/;"	d
@@ -1237,6 +1197,7 @@ c	wc.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c	zombie.asm	/^    c = fmt[i] & 0xff;$/;"	d
 c0	echo.asm	/^  c0:	c3                   	ret    $/;"	l
 c0	ln.asm	/^  c0:	88 10                	mov    %dl,(%eax)$/;"	l
+c0	memsan.asm	/^  c0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 c0	mkdir.asm	/^  c0:	90                   	nop$/;"	l
 c0	rm.asm	/^  c0:	90                   	nop$/;"	l
 c0	wc.asm	/^  c0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
@@ -1253,7 +1214,6 @@ c1	echo.asm	/^  c1:	55                   	push   %ebp$/;"	l
 c1	grep.asm	/^  c1:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
 c1	init.asm	/^  c1:	c7 44 24 04 f4 08 00 	movl   $0x8f4,0x4(%esp)$/;"	l
 c1	kill.asm	/^  c1:	83 45 08 01          	addl   $0x1,0x8(%ebp)$/;"	l
-c1	memsan.asm	/^  c1:	e8 49 03 00 00       	call   40f <gets>$/;"	l
 c1	mkdir.asm	/^  c1:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 c1	rm.asm	/^  c1:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 c1	sh.asm	/^      c1:	00 $/;"	l
@@ -1296,6 +1256,7 @@ c4	echo.asm	/^  c4:	eb 08                	jmp    ce <strcmp+0xd>$/;"	l
 c4	ls.asm	/^  c4:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 c4	mkdir.asm	/^  c4:	8d 50 01             	lea    0x1(%eax),%edx$/;"	l
 c4	rm.asm	/^  c4:	8d 50 01             	lea    0x1(%eax),%edx$/;"	l
+c4	testfork.asm	/^  c4:	7e c9                	jle    8f <main+0x8f>$/;"	l
 c4	zombie.asm	/^  c4:	eb 04                	jmp    ca <strlen+0x13>$/;"	l
 c40	usertests.asm	/^     c40:	8b 45 e4             	mov    -0x1c(%ebp),%eax$/;"	l
 c43	sh.asm	/^     c43:	ff e0                	jmp    *%eax$/;"	l
@@ -1319,8 +1280,8 @@ c5d	sh.asm	/^     c5d:	8b 44 90 0c          	mov    0xc(%eax,%edx,4),%eax$/;"	l
 c5f	usertests.asm	/^     c5f:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 c6	echo.asm	/^  c6:	83 45 08 01          	addl   $0x1,0x8(%ebp)$/;"	l
 c6	forktest.asm	/^  c6:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)$/;"	l
-c6	memsan.asm	/^  c6:	c7 44 24 2c 00 00 00 	movl   $0x0,0x2c(%esp)$/;"	l
 c6	stressfs.asm	/^  c6:	00 $/;"	l
+c6	testfork.asm	/^  c6:	c7 44 24 04 58 09 00 	movl   $0x958,0x4(%esp)$/;"	l
 c6	zombie.asm	/^  c6:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)$/;"	l
 c61	sh.asm	/^     c61:	c6 00 00             	movb   $0x0,(%eax)$/;"	l
 c62	usertests.asm	/^     c62:	89 04 24             	mov    %eax,(%esp)$/;"	l
@@ -1333,6 +1294,7 @@ c6d	usertests.asm	/^     c6d:	89 04 24             	mov    %eax,(%esp)$/;"	l
 c6e	sh.asm	/^     c6e:	8b 44 90 04          	mov    0x4(%eax,%edx,4),%eax$/;"	l
 c7	ln.asm	/^  c7:	75 e2                	jne    ab <strcpy+0xd>$/;"	l
 c7	ls.asm	/^  c7:	89 04 24             	mov    %eax,(%esp)$/;"	l
+c7	memsan.asm	/^  c7:	e8 96 04 00 00       	call   562 <printf>$/;"	l
 c7	mkdir.asm	/^  c7:	89 55 08             	mov    %edx,0x8(%ebp)$/;"	l
 c7	rm.asm	/^  c7:	89 55 08             	mov    %edx,0x8(%ebp)$/;"	l
 c7	stressfs.asm	/^  c7:	8d 84 24 1e 02 00 00 	lea    0x21e(%esp),%eax$/;"	l
@@ -1412,10 +1374,12 @@ cc	ln.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	ln.asm	/^  cc:	c9                   	leave  $/;"	l
 cc	ls.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	memsan.asm	/^    cc = read(0, &c, 1);$/;"	d
+cc	memsan.asm	/^  cc:	e8 09 03 00 00       	call   3da <fork>$/;"	l
 cc	mkdir.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	rm.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	sh.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	stressfs.asm	/^    cc = read(0, &c, 1);$/;"	d
+cc	testfork.asm	/^    cc = read(0, &c, 1);$/;"	d
 cc	usertests.asm	/^        cc = sizeof(buf);$/;"	d
 cc	usertests.asm	/^      cc = cc * 2;$/;"	d
 cc	usertests.asm	/^    cc = 1;$/;"	d
@@ -1435,9 +1399,9 @@ ccd	usertests.asm	/^     ccd:	89 45 f0             	mov    %eax,-0x10(%ebp)$/;"	
 ccf	sh.asm	/^     ccf:	8b 45 e4             	mov    -0x1c(%ebp),%eax$/;"	l
 cd	cat.asm	/^  cd:	01 d0                	add    %edx,%eax$/;"	l
 cd	ln.asm	/^  cd:	c3                   	ret    $/;"	l
-cd	memsan.asm	/^  cd:	00 $/;"	l
 cd	mkdir.asm	/^  cd:	8d 4a 01             	lea    0x1(%edx),%ecx$/;"	l
 cd	rm.asm	/^  cd:	8d 4a 01             	lea    0x1(%edx),%ecx$/;"	l
+cd	testfork.asm	/^  cd:	00 $/;"	l
 cd	zombie.asm	/^  cd:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 cd0	usertests.asm	/^     cd0:	83 7d f0 00          	cmpl   $0x0,-0x10(%ebp)$/;"	l
 cd2	sh.asm	/^     cd2:	8b 40 08             	mov    0x8(%eax),%eax$/;"	l
@@ -1451,9 +1415,9 @@ cde	usertests.asm	/^     cde:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 cdf	sh.asm	/^     cdf:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 ce	echo.asm	/^  ce:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 ce	ln.asm	/^  ce:	55                   	push   %ebp$/;"	l
-ce	memsan.asm	/^  ce:	eb 52                	jmp    122 <main+0x122>$/;"	l
 ce	sh.asm	/^      ce:	e8 8e 0e 00 00       	call   f61 <exit>$/;"	l
 ce	stressfs.asm	/^  ce:	89 04 24             	mov    %eax,(%esp)$/;"	l
+ce	testfork.asm	/^  ce:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 ce2	sh.asm	/^     ce2:	89 45 e0             	mov    %eax,-0x20(%ebp)$/;"	l
 ce5	sh.asm	/^     ce5:	8b 45 e0             	mov    -0x20(%ebp),%eax$/;"	l
 ce5	usertests.asm	/^     ce5:	e8 4b 33 00 00       	call   4035 <printf>$/;"	l
@@ -1557,7 +1521,6 @@ d	mkdir.asm	/^   d:	7f 19                	jg     28 <main+0x28>$/;"	l
 d	rm.asm	/^   d:	7f 19                	jg     28 <main+0x28>$/;"	l
 d	wc.asm	/^   d:	8b 45 e8             	mov    -0x18(%ebp),%eax$/;"	l
 d0	init.asm	/^  d0:	e8 22 04 00 00       	call   4f7 <printf>$/;"	l
-d0	memsan.asm	/^  d0:	8b 44 24 2c          	mov    0x2c(%esp),%eax$/;"	l
 d0	mkdir.asm	/^  d0:	89 4d 0c             	mov    %ecx,0xc(%ebp)$/;"	l
 d0	rm.asm	/^  d0:	89 4d 0c             	mov    %ecx,0xc(%ebp)$/;"	l
 d0	usertests.asm	/^      d0:	89 04 24             	mov    %eax,(%esp)$/;"	l
@@ -1577,6 +1540,7 @@ d1	echo.asm	/^  d1:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 d1	forktest.asm	/^  d1:	83 f8 ff             	cmp    $0xffffffff,%eax$/;"	l
 d1	kill.asm	/^  d1:	74 10                	je     e3 <strcmp+0x27>$/;"	l
 d1	ln.asm	/^  d1:	eb 08                	jmp    db <strcmp+0xd>$/;"	l
+d1	memsan.asm	/^  d1:	89 44 24 10          	mov    %eax,0x10(%esp)$/;"	l
 d1	stressfs.asm	/^  d1:	e8 85 03 00 00       	call   45b <open>$/;"	l
 d1	wc.asm	/^  d1:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 d10	sh.asm	/^     d10:	89 ca                	mov    %ecx,%edx$/;"	l
@@ -1627,7 +1591,6 @@ d3d	sh.asm	/^     d3d:	0f b6 12             	movzbl (%edx),%edx$/;"	l
 d3d	usertests.asm	/^     d3d:	c7 44 24 04 3f 49 00 	movl   $0x493f,0x4(%esp)$/;"	l
 d4	echo.asm	/^  d4:	84 c0                	test   %al,%al$/;"	l
 d4	forktest.asm	/^  d4:	74 19                	je     ef <forktest+0xc6>$/;"	l
-d4	memsan.asm	/^  d4:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
 d4	wc.asm	/^  d4:	89 44 24 14          	mov    %eax,0x14(%esp)$/;"	l
 d40	sh.asm	/^     d40:	88 10                	mov    %dl,(%eax)$/;"	l
 d42	sh.asm	/^     d42:	0f b6 00             	movzbl (%eax),%eax$/;"	l
@@ -1643,6 +1606,8 @@ d4e	sh.asm	/^     d4e:	55                   	push   %ebp$/;"	l
 d4f	sh.asm	/^     d4f:	89 e5                	mov    %esp,%ebp$/;"	l
 d5	cat.asm	/^  d5:	c7 44 24 04 e2 08 00 	movl   $0x8e2,0x4(%esp)$/;"	l
 d5	init.asm	/^  d5:	e8 9d 02 00 00       	call   377 <exit>$/;"	l
+d5	memsan.asm	/^  d5:	83 7c 24 10 00       	cmpl   $0x0,0x10(%esp)$/;"	l
+d5	testfork.asm	/^  d5:	e8 3d 04 00 00       	call   517 <printf>$/;"	l
 d5	zombie.asm	/^  d5:	84 c0                	test   %al,%al$/;"	l
 d51	sh.asm	/^     d51:	eb 08                	jmp    d5b <strcmp+0xd>$/;"	l
 d51	usertests.asm	/^     d51:	e8 df 31 00 00       	call   3f35 <getpid>$/;"	l
@@ -1687,7 +1652,6 @@ d7f	usertests.asm	/^     d7f:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 d8	echo.asm	/^  d8:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 d8	grep.asm	/^  d8:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 d8	ls.asm	/^  d8:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
-d8	memsan.asm	/^  d8:	c7 44 24 04 f4 0a 00 	movl   $0xaf4,0x4(%esp)$/;"	l
 d8	mkdir.asm	/^  d8:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 d8	rm.asm	/^  d8:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 d8	usertests.asm	/^      d8:	c9                   	leave  $/;"	l
@@ -1718,6 +1682,8 @@ d9c	sh.asm	/^     d9c:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)$/;"	l
 d9c	usertests.asm	/^     d9c:	8b 00                	mov    (%eax),%eax$/;"	l
 d9e	usertests.asm	/^     d9e:	89 45 e8             	mov    %eax,-0x18(%ebp)$/;"	l
 da	init.asm	/^  da:	eb 14                	jmp    f0 <main+0xf0>$/;"	l
+da	memsan.asm	/^  da:	75 05                	jne    e1 <main+0xe1>$/;"	l
+da	testfork.asm	/^  da:	83 7c 24 44 00       	cmpl   $0x0,0x44(%esp)$/;"	l
 da	usertests.asm	/^      da:	55                   	push   %ebp$/;"	l
 da0	sh.asm	/^     da0:	8b 55 fc             	mov    -0x4(%ebp),%edx$/;"	l
 da1	usertests.asm	/^     da1:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
@@ -1760,6 +1726,7 @@ dbf	usertests.asm	/^     dbf:	e8 5d 35 00 00       	call   4321 <malloc>$/;"	l
 dc	cat.asm	/^  dc:	00 $/;"	l
 dc	init.asm	/^  dc:	c7 44 24 04 0a 09 00 	movl   $0x90a,0x4(%esp)$/;"	l
 dc	kill.asm	/^  dc:	0f b6 00             	movzbl (%eax),%eax$/;"	l
+dc	memsan.asm	/^  dc:	c6 44 24 17 62       	movb   $0x62,0x17(%esp)$/;"	l
 dc	sh.asm	/^      dc:	e8 1f ff ff ff       	call   0 <runcmd>$/;"	l
 dc	zombie.asm	/^  dc:	c9                   	leave  $/;"	l
 dc1	sh.asm	/^     dc1:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
@@ -1814,9 +1781,9 @@ devsw	file.c	/^struct devsw devsw[NDEV];$/;"	v	typeref:struct:devsw
 devsw	file.h	/^struct devsw {$/;"	s
 df	kill.asm	/^  df:	38 c2                	cmp    %al,%dl$/;"	l
 df	ls.asm	/^  df:	c7 44 24 04 0f 0b 00 	movl   $0xb0f,0x4(%esp)$/;"	l
-df	memsan.asm	/^  df:	00 $/;"	l
 df	mkdir.asm	/^  df:	8b 45 fc             	mov    -0x4(%ebp),%eax$/;"	l
 df	rm.asm	/^  df:	8b 45 fc             	mov    -0x4(%ebp),%eax$/;"	l
+df	testfork.asm	/^  df:	7e 05                	jle    e6 <main+0xe6>$/;"	l
 df	wc.asm	/^  df:	8b 45 ec             	mov    -0x14(%ebp),%eax$/;"	l
 df	zombie.asm	/^  df:	89 e5                	mov    %esp,%ebp$/;"	l
 df1	sh.asm	/^     df1:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
@@ -1857,6 +1824,7 @@ dst	mkdir.asm	/^  dst = vdst;$/;"	d
 dst	rm.asm	/^  dst = vdst;$/;"	d
 dst	sh.asm	/^  dst = vdst;$/;"	d
 dst	stressfs.asm	/^  dst = vdst;$/;"	d
+dst	testfork.asm	/^  dst = vdst;$/;"	d
 dst	usertests.asm	/^  dst = vdst;$/;"	d
 dst	wc.asm	/^  dst = vdst;$/;"	d
 dst	zombie.asm	/^  dst = vdst;$/;"	d
@@ -1864,7 +1832,6 @@ e	console.c	/^  uint e;  \/\/ Edit index$/;"	m	struct:__anon4	file:
 e	kernel.asm	/^  e = addr+len;$/;"	d
 e	zombie.asm	/^   e:	85 c0                	test   %eax,%eax$/;"	l
 e0	grep.asm	/^  e0:	29 c2                	sub    %eax,%edx$/;"	l
-e0	memsan.asm	/^  e0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)$/;"	l
 e0	usertests.asm	/^      e0:	a1 c4 62 00 00       	mov    0x62c4,%eax$/;"	l
 e00	sh.asm	/^     e00:	84 c0                	test   %al,%al$/;"	l
 e02	sh.asm	/^     e02:	75 e2                	jne    de6 <strchr+0xe>$/;"	l
@@ -1880,7 +1847,9 @@ e0e	sh.asm	/^     e0e:	83 ec 28             	sub    $0x28,%esp$/;"	l
 e1	echo.asm	/^  e1:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 e1	kill.asm	/^  e1:	74 de                	je     c1 <strcmp+0x5>$/;"	l
 e1	ln.asm	/^  e1:	84 c0                	test   %al,%al$/;"	l
+e1	memsan.asm	/^  e1:	e8 04 03 00 00       	call   3ea <wait>$/;"	l
 e1	sh.asm	/^      e1:	e9 20 01 00 00       	jmp    206 <runcmd+0x206>$/;"	l
+e1	testfork.asm	/^  e1:	e8 b9 02 00 00       	call   39f <wait>$/;"	l
 e1	zombie.asm	/^  e1:	83 ec 0c             	sub    $0xc,%esp$/;"	l
 e10	usertests.asm	/^     e10:	e8 a0 30 00 00       	call   3eb5 <exit>$/;"	l
 e11	sh.asm	/^     e11:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)$/;"	l
@@ -1952,7 +1921,9 @@ e5f	usertests.asm	/^     e5f:	c7 44 24 04 84 49 00 	movl   $0x4984,0x4(%esp)$/;"
 e6	echo.asm	/^  e6:	74 de                	je     c6 <strcmp+0x5>$/;"	l
 e6	kill.asm	/^  e6:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 e6	ls.asm	/^  e6:	00 $/;"	l
+e6	memsan.asm	/^  e6:	83 7c 24 10 00       	cmpl   $0x0,0x10(%esp)$/;"	l
 e6	sh.asm	/^      e6:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
+e6	testfork.asm	/^  e6:	83 7c 24 48 00       	cmpl   $0x0,0x48(%esp)$/;"	l
 e6	wc.asm	/^  e6:	8b 45 f0             	mov    -0x10(%ebp),%eax$/;"	l
 e62	sh.asm	/^     e62:	3c 0d                	cmp    $0xd,%al$/;"	l
 e64	sh.asm	/^     e64:	74 0b                	je     e71 <gets+0x66>$/;"	l
@@ -1965,7 +1936,6 @@ e6e	usertests.asm	/^     e6e:	e8 c2 31 00 00       	call   4035 <printf>$/;"	l
 e6f	sh.asm	/^     e6f:	7c a9                	jl     e1a <gets+0xf>$/;"	l
 e7	grep.asm	/^  e7:	81 c2 60 0e 00 00    	add    $0xe60,%edx$/;"	l
 e7	ls.asm	/^  e7:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)$/;"	l
-e7	memsan.asm	/^  e7:	e8 f9 05 00 00       	call   6e5 <printf>$/;"	l
 e7	mkdir.asm	/^  e7:	eb 08                	jmp    f1 <strcmp+0xd>$/;"	l
 e7	rm.asm	/^  e7:	eb 08                	jmp    f1 <strcmp+0xd>$/;"	l
 e7	zombie.asm	/^  e7:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
@@ -2023,6 +1993,8 @@ eax	x86.h	/^  uint eax;$/;"	m	struct:trapframe
 eb	echo.asm	/^  eb:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 eb	init.asm	/^  eb:	e8 07 04 00 00       	call   4f7 <printf>$/;"	l
 eb	ln.asm	/^  eb:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
+eb	memsan.asm	/^  eb:	75 07                	jne    f4 <main+0xf4>$/;"	l
+eb	testfork.asm	/^  eb:	7e 05                	jle    f2 <main+0xf2>$/;"	l
 eb	zombie.asm	/^  eb:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
 eb0	usertests.asm	/^     eb0:	eb 39                	jmp    eeb <sharedfd+0xcf>$/;"	l
 eb1	sh.asm	/^     eb1:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
@@ -2043,7 +2015,6 @@ ebx	mmu.h	/^  uint ebx;$/;"	m	struct:taskstate
 ebx	proc.h	/^  uint ebx;$/;"	m	struct:context
 ebx	x86.h	/^  uint ebx;$/;"	m	struct:trapframe
 ec	kill.asm	/^  ec:	8b 45 0c             	mov    0xc(%ebp),%eax$/;"	l
-ec	memsan.asm	/^  ec:	c7 44 24 28 00 00 00 	movl   $0x0,0x28(%esp)$/;"	l
 ec	sh.asm	/^      ec:	e8 8c 02 00 00       	call   37d <fork1>$/;"	l
 ec	usertests.asm	/^      ec:	00 $/;"	l
 ec1	usertests.asm	/^     ec1:	8b 45 e8             	mov    -0x18(%ebp),%eax$/;"	l
@@ -2062,8 +2033,10 @@ ecmd	sh.asm	/^    ecmd = (struct execcmd*)cmd;$/;"	d
 ecx	mmu.h	/^  uint ecx;$/;"	m	struct:taskstate
 ecx	x86.h	/^  uint ecx;$/;"	m	struct:trapframe
 ed	grep.asm	/^  ed:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
+ed	memsan.asm	/^  ed:	b8 62 09 00 00       	mov    $0x962,%eax$/;"	l
 ed	mkdir.asm	/^  ed:	83 45 0c 01          	addl   $0x1,0xc(%ebp)$/;"	l
 ed	rm.asm	/^  ed:	83 45 0c 01          	addl   $0x1,0xc(%ebp)$/;"	l
+ed	testfork.asm	/^  ed:	e8 ad 02 00 00       	call   39f <wait>$/;"	l
 ed	usertests.asm	/^      ed:	89 04 24             	mov    %eax,(%esp)$/;"	l
 ed	wc.asm	/^  ed:	c7 44 24 04 a3 09 00 	movl   $0x9a3,0x4(%esp)$/;"	l
 ed0	sh.asm	/^     ed0:	89 e5                	mov    %esp,%ebp$/;"	l
@@ -2196,7 +2169,9 @@ f1e	usertests.asm	/^     f1e:	e8 d2 2f 00 00       	call   3ef5 <open>$/;"	l
 f1f	sh.asm	/^     f1f:	83 ec 10             	sub    $0x10,%esp$/;"	l
 f2	cat.asm	/^  f2:	89 04 24             	mov    %eax,(%esp)$/;"	l
 f2	kill.asm	/^  f2:	0f b6 c0             	movzbl %al,%eax$/;"	l
+f2	memsan.asm	/^  f2:	eb 05                	jmp    f9 <main+0xf9>$/;"	l
 f2	stressfs.asm	/^  f2:	8d 44 24 1e          	lea    0x1e(%esp),%eax$/;"	l
+f2	testfork.asm	/^  f2:	8b 44 24 48          	mov    0x48(%esp),%eax$/;"	l
 f2	zombie.asm	/^  f2:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 f22	sh.asm	/^     f22:	8b 45 08             	mov    0x8(%ebp),%eax$/;"	l
 f23	usertests.asm	/^     f23:	89 45 e8             	mov    %eax,-0x18(%ebp)$/;"	l
@@ -2209,7 +2184,6 @@ f2c	usertests.asm	/^     f2c:	c7 44 24 04 d0 49 00 	movl   $0x49d0,0x4(%esp)$/;"
 f2e	sh.asm	/^     f2e:	eb 17                	jmp    f47 <memmove+0x2b>$/;"	l
 f3	ln.asm	/^  f3:	74 de                	je     d3 <strcmp+0x5>$/;"	l
 f3	ls.asm	/^  f3:	e9 01 02 00 00       	jmp    2f9 <ls+0x249>$/;"	l
-f3	memsan.asm	/^  f3:	00 $/;"	l
 f3	sh.asm	/^      f3:	75 0e                	jne    103 <runcmd+0x103>$/;"	l
 f30	sh.asm	/^     f30:	8b 45 fc             	mov    -0x4(%ebp),%eax$/;"	l
 f33	sh.asm	/^     f33:	8d 50 01             	lea    0x1(%eax),%edx$/;"	l
@@ -2221,7 +2195,7 @@ f3b	usertests.asm	/^     f3b:	e8 f5 30 00 00       	call   4035 <printf>$/;"	l
 f3c	sh.asm	/^     f3c:	8d 4a 01             	lea    0x1(%edx),%ecx$/;"	l
 f3f	sh.asm	/^     f3f:	89 4d f8             	mov    %ecx,-0x8(%ebp)$/;"	l
 f4	echo.asm	/^  f4:	0f b6 00             	movzbl (%eax),%eax$/;"	l
-f4	memsan.asm	/^  f4:	eb 1d                	jmp    113 <main+0x113>$/;"	l
+f4	memsan.asm	/^  f4:	b8 68 09 00 00       	mov    $0x968,%eax$/;"	l
 f4	mkdir.asm	/^  f4:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 f4	rm.asm	/^  f4:	0f b6 00             	movzbl (%eax),%eax$/;"	l
 f4	wc.asm	/^  f4:	00 $/;"	l
@@ -2255,8 +2229,8 @@ f5b	usertests.asm	/^     f5b:	eb 2a                	jmp    f87 <sharedfd+0x16b>$
 f5d	usertests.asm	/^     f5d:	8d 55 d6             	lea    -0x2a(%ebp),%edx$/;"	l
 f5e	sh.asm	/^     f5e:	cd 40                	int    $0x40$/;"	l
 f6	forktest.asm	/^  f6:	00 $/;"	l
-f6	memsan.asm	/^  f6:	8b 44 24 2c          	mov    0x2c(%esp),%eax$/;"	l
 f6	stressfs.asm	/^  f6:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
+f6	testfork.asm	/^  f6:	89 44 24 0c          	mov    %eax,0xc(%esp)$/;"	l
 f60	sh.asm	/^     f60:	c3                   	ret    $/;"	l
 f60	usertests.asm	/^     f60:	8b 45 f4             	mov    -0xc(%ebp),%eax$/;"	l
 f61	sh.asm	/^     f61:	b8 02 00 00 00       	mov    $0x2,%eax$/;"	l
@@ -2305,6 +2279,7 @@ f8e	sh.asm	/^     f8e:	cd 40                	int    $0x40$/;"	l
 f8f	usertests.asm	/^     f8f:	c7 44 24 08 0a 00 00 	movl   $0xa,0x8(%esp)$/;"	l
 f9	init.asm	/^  f9:	83 7c 24 18 00       	cmpl   $0x0,0x18(%esp)$/;"	l
 f9	kill.asm	/^  f9:	5d                   	pop    %ebp$/;"	l
+f9	memsan.asm	/^  f9:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
 f9	mkdir.asm	/^  f9:	74 10                	je     10b <strcmp+0x27>$/;"	l
 f9	rm.asm	/^  f9:	74 10                	je     10b <strcmp+0x27>$/;"	l
 f90	sh.asm	/^     f90:	c3                   	ret    $/;"	l
@@ -2320,8 +2295,8 @@ f9e	usertests.asm	/^     f9e:	8b 45 e8             	mov    -0x18(%ebp),%eax$/;"	
 fa	cat.asm	/^  fa:	8b 44 24 18          	mov    0x18(%esp),%eax$/;"	l
 fa	echo.asm	/^  fa:	29 c2                	sub    %eax,%edx$/;"	l
 fa	kill.asm	/^  fa:	c3                   	ret    $/;"	l
-fa	memsan.asm	/^  fa:	8b 14 85 20 0e 00 00 	mov    0xe20(,%eax,4),%edx$/;"	l
 fa	stressfs.asm	/^  fa:	8b 84 24 28 02 00 00 	mov    0x228(%esp),%eax$/;"	l
+fa	testfork.asm	/^  fa:	8b 44 24 44          	mov    0x44(%esp),%eax$/;"	l
 fa	usertests.asm	/^      fa:	89 45 f4             	mov    %eax,-0xc(%ebp)$/;"	l
 fa0	sh.asm	/^     fa0:	c3                   	ret    $/;"	l
 fa1	sh.asm	/^     fa1:	b8 0f 00 00 00       	mov    $0xf,%eax$/;"	l
@@ -2370,6 +2345,7 @@ fd	kill.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	ln.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	ls.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	memsan.asm	/^  fd = open(n, O_RDONLY);$/;"	d
+fd	memsan.asm	/^  fd:	c7 44 24 04 6f 09 00 	movl   $0x96f,0x4(%esp)$/;"	l
 fd	mkdir.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	rm.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	sh.asm	/^  fd = open(n, O_RDONLY);$/;"	d
@@ -2377,6 +2353,7 @@ fd	sh.c	/^  int fd;$/;"	m	struct:redircmd	file:
 fd	stressfs.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	stressfs.asm	/^  fd = open(path, O_CREATE | O_RDWR);$/;"	d
 fd	stressfs.asm	/^  fd = open(path, O_RDONLY);$/;"	d
+fd	testfork.asm	/^  fd = open(n, O_RDONLY);$/;"	d
 fd	usertests.asm	/^        fd = open(name, O_CREATE | O_RDWR);$/;"	d
 fd	usertests.asm	/^      fd = open(file, O_CREATE | O_RDWR);$/;"	d
 fd	usertests.asm	/^      fd = open(fname, O_CREATE | O_RDWR);$/;"	d
@@ -2442,6 +2419,7 @@ fe	ls.asm	/^  fe:	89 44 24 04          	mov    %eax,0x4(%esp)$/;"	l
 fe	mkdir.asm	/^  fe:	0f b6 10             	movzbl (%eax),%edx$/;"	l
 fe	rm.asm	/^  fe:	0f b6 10             	movzbl (%eax),%edx$/;"	l
 fe	sh.asm	/^      fe:	e8 fd fe ff ff       	call   0 <runcmd>$/;"	l
+fe	testfork.asm	/^  fe:	89 44 24 08          	mov    %eax,0x8(%esp)$/;"	l
 fe0	sh.asm	/^     fe0:	c3                   	ret    $/;"	l
 fe1	sh.asm	/^     fe1:	b8 0b 00 00 00       	mov    $0xb,%eax$/;"	l
 fe2	usertests.asm	/^     fe2:	00 $/;"	l
@@ -2528,6 +2506,8 @@ freep	sh.asm	/^      freep = prevp;$/;"	d
 freep	sh.asm	/^  freep = p;$/;"	d
 freep	stressfs.asm	/^      freep = prevp;$/;"	d
 freep	stressfs.asm	/^  freep = p;$/;"	d
+freep	testfork.asm	/^      freep = prevp;$/;"	d
+freep	testfork.asm	/^  freep = p;$/;"	d
 freep	umalloc.c	/^static Header *freep;$/;"	v	file:
 freep	usertests.asm	/^      freep = prevp;$/;"	d
 freep	usertests.asm	/^  freep = p;$/;"	d
@@ -2581,6 +2561,7 @@ hp	mkdir.asm	/^  hp = (Header*)p;$/;"	d
 hp	rm.asm	/^  hp = (Header*)p;$/;"	d
 hp	sh.asm	/^  hp = (Header*)p;$/;"	d
 hp	stressfs.asm	/^  hp = (Header*)p;$/;"	d
+hp	testfork.asm	/^  hp = (Header*)p;$/;"	d
 hp	usertests.asm	/^  hp = (Header*)p;$/;"	d
 hp	wc.asm	/^  hp = (Header*)p;$/;"	d
 hp	zombie.asm	/^  hp = (Header*)p;$/;"	d
@@ -2598,6 +2579,7 @@ i	mkdir.asm	/^  i = 0;$/;"	d
 i	rm.asm	/^  i = 0;$/;"	d
 i	sh.asm	/^  i = 0;$/;"	d
 i	stressfs.asm	/^  i = 0;$/;"	d
+i	testfork.asm	/^  i = 0;$/;"	d
 i	usertests.asm	/^      i = de.name[1] - '0';$/;"	d
 i	usertests.asm	/^    i = read(fd, buf, 512);$/;"	d
 i	usertests.asm	/^  i = 0;$/;"	d
@@ -2666,6 +2648,7 @@ int	mkdir.asm	/^int$/;"	l
 int	rm.asm	/^int$/;"	l
 int	sh.asm	/^int$/;"	l
 int	stressfs.asm	/^int$/;"	l
+int	testfork.asm	/^int$/;"	l
 int	usertests.asm	/^int stdout = 1;$/;"	l
 int	usertests.asm	/^int$/;"	l
 int	wc.asm	/^int$/;"	l
@@ -2707,6 +2690,7 @@ ismp	kernel.asm	/^        ismp = 0;$/;"	d
 ismp	kernel.asm	/^      ismp = 0;$/;"	d
 ismp	kernel.asm	/^  ismp = 1;$/;"	d
 ismp	mp.c	/^int ismp;$/;"	v
+it	kernel.asm	/^    it = proc->pg_data.pgs + 3;$/;"	d
 itoa	fs.c	/^char* itoa(int i, char b[]){$/;"	f
 itrunc	fs.c	/^itrunc(struct inode *ip)$/;"	f	file:
 iunlock	fs.c	/^iunlock(struct inode *ip)$/;"	f
@@ -2787,17 +2771,9 @@ m	kernel.asm	/^      m = 1 << (bi % 8);$/;"	d
 m	kernel.asm	/^    m = min(n - tot, BSIZE - off%BSIZE);$/;"	d
 m	kernel.asm	/^  m = 1 << (bi % 8);$/;"	d
 m	memsan.c	/^char* m[COUNT];$/;"	v
-m1	memsan.asm	/^      m1 = m2;$/;"	d
-m1	memsan.asm	/^    m1 = 0;$/;"	d
-m1	memsan.asm	/^    m1 = m2;$/;"	d
-m1	memsan.asm	/^    m1 = malloc(1024*20);$/;"	d
-m1	memsan.asm	/^  m1 = 0;$/;"	d
-m1	memsan.asm	/^  m1 = malloc(1024*20);$/;"	d
 m1	usertests.asm	/^      m1 = m2;$/;"	d
 m1	usertests.asm	/^    m1 = 0;$/;"	d
 m1	usertests.asm	/^    m1 = malloc(1024*20);$/;"	d
-m2	memsan.asm	/^      m2 = *(char**)m1;$/;"	d
-m2	memsan.asm	/^    m2 = *(char**)m1;$/;"	d
 m2	usertests.asm	/^      m2 = *(char**)m1;$/;"	d
 machine	elf.h	/^  ushort machine;$/;"	m	struct:elfhdr
 magic	elf.h	/^  uint magic;  \/\/ must equal ELF_MAGIC$/;"	m	struct:elfhdr
@@ -2816,6 +2792,7 @@ main	mkfs.c	/^main(int argc, char *argv[])$/;"	f
 main	rm.c	/^main(int argc, char *argv[])$/;"	f
 main	sh.c	/^main(void)$/;"	f
 main	stressfs.c	/^main(int argc, char *argv[])$/;"	f
+main	testfork.c	/^main(int argc, char *argv[])$/;"	f
 main	usertests.c	/^main(int argc, char *argv[])$/;"	f
 main	wc.c	/^main(int argc, char *argv[])$/;"	f
 main	zombie.c	/^main(void)$/;"	f
@@ -2830,9 +2807,7 @@ maxintr	kernel.asm	/^  maxintr = (ioapicread(REG_VER) >> 16) & 0xFF;$/;"	d
 mem	kernel.asm	/^    mem = kalloc();$/;"	d
 mem	kernel.asm	/^  mem = kalloc(); $/;"	d
 mem	kernel.asm	/^  mem = kalloc();$/;"	d
-mem	memsan.c	/^mem(void)$/;"	f
 mem	usertests.c	/^mem(void)$/;"	f
-mem2	memsan.c	/^void mem2(){$/;"	f
 memcmp	string.c	/^memcmp(const void *v1, const void *v2, uint n)$/;"	f
 memcpy	string.c	/^memcpy(void *dst, const void *src, uint n)$/;"	f
 memdisk	memide.c	/^static uchar *memdisk;$/;"	v	file:
@@ -2843,7 +2818,7 @@ memset	ulib.c	/^memset(void *dst, int c, uint n)$/;"	f
 memsz	elf.h	/^  uint memsz;$/;"	m	struct:proghdr
 microdelay	lapic.c	/^microdelay(int us)$/;"	f
 min	fs.c	23;"	d	file:
-min	kernel.asm	/^      min = min->nfu_time > it->nfu_time ? it : min;$/;"	d
+min	kernel.asm	/^        min = min->ctime > it->ctime ? it : min;$/;"	d
 min	mkfs.c	253;"	d	file:
 minor	file.h	/^  short minor;$/;"	m	struct:inode
 minor	fs.h	/^  short minor;          \/\/ Minor device number (T_DEV only)$/;"	m	struct:dinode
@@ -2895,6 +2870,8 @@ n	sh.asm	/^    n = n*10 + *s++ - '0';$/;"	d
 n	sh.asm	/^  n = 0;$/;"	d
 n	stressfs.asm	/^    n = n*10 + *s++ - '0';$/;"	d
 n	stressfs.asm	/^  n = 0;$/;"	d
+n	testfork.asm	/^    n = n*10 + *s++ - '0';$/;"	d
+n	testfork.asm	/^  n = 0;$/;"	d
 n	usertests.asm	/^    n = n*10 + *s++ - '0';$/;"	d
 n	usertests.asm	/^  n = 0;$/;"	d
 n	wc.asm	/^    n = n*10 + *s++ - '0';$/;"	d
@@ -2918,6 +2895,7 @@ name	rm.asm	/^  name: \\$/;"	l
 name	sh.asm	/^  name: \\$/;"	l
 name	spinlock.h	/^  char *name;        \/\/ Name of lock.$/;"	m	struct:spinlock
 name	stressfs.asm	/^  name: \\$/;"	l
+name	testfork.asm	/^  name: \\$/;"	l
 name	usertests.asm	/^  name: \\$/;"	l
 name	usertests.c	/^char name[3];$/;"	v
 name	usys.S	/^  name: \\$/;"	l
@@ -2958,6 +2936,8 @@ neg	sh.asm	/^    neg = 1;$/;"	d
 neg	sh.asm	/^  neg = 0;$/;"	d
 neg	stressfs.asm	/^    neg = 1;$/;"	d
 neg	stressfs.asm	/^  neg = 0;$/;"	d
+neg	testfork.asm	/^    neg = 1;$/;"	d
+neg	testfork.asm	/^  neg = 0;$/;"	d
 neg	usertests.asm	/^    neg = 1;$/;"	d
 neg	usertests.asm	/^  neg = 0;$/;"	d
 neg	wc.asm	/^    neg = 1;$/;"	d
@@ -2991,6 +2971,7 @@ nu	mkdir.asm	/^    nu = 4096;$/;"	d
 nu	rm.asm	/^    nu = 4096;$/;"	d
 nu	sh.asm	/^    nu = 4096;$/;"	d
 nu	stressfs.asm	/^    nu = 4096;$/;"	d
+nu	testfork.asm	/^    nu = 4096;$/;"	d
 nu	usertests.asm	/^    nu = 4096;$/;"	d
 nu	wc.asm	/^    nu = 4096;$/;"	d
 nu	zombie.asm	/^    nu = 4096;$/;"	d
@@ -3008,6 +2989,7 @@ nunits	mkdir.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;
 nunits	rm.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
 nunits	sh.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
 nunits	stressfs.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
+nunits	testfork.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
 nunits	usertests.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
 nunits	wc.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
 nunits	zombie.asm	/^  nunits = (nbytes + sizeof(Header) - 1)\/sizeof(Header) + 1;$/;"	d
@@ -3020,6 +3002,7 @@ off	file.h	/^  uint off;$/;"	m	struct:file
 off_15_0	mmu.h	/^  uint off_15_0 : 16;   \/\/ low 16 bits of offset in segment$/;"	m	struct:gatedesc
 off_31_16	mmu.h	/^  uint off_31_16 : 16;  \/\/ high bits of offset in segment$/;"	m	struct:gatedesc
 offset	bootblock.asm	/^  offset = (offset \/ SECTSIZE) + 1;$/;"	d
+offset	kernel.asm	/^        offset = (pg->idx_swp * PGSIZE) + (i * PGSIZE\/sz);$/;"	d
 ofile	proc.h	/^  struct file *ofile[NOFILE];  \/\/ Open files$/;"	m	struct:proc	typeref:struct:proc::file
 oldbrk	usertests.asm	/^  oldbrk = sbrk(0);$/;"	d
 oldpgdir	kernel.asm	/^  oldpgdir = proc->pgdir;$/;"	d
@@ -3039,6 +3022,7 @@ os	mkdir.asm	/^  os = s;$/;"	d
 os	rm.asm	/^  os = s;$/;"	d
 os	sh.asm	/^  os = s;$/;"	d
 os	stressfs.asm	/^  os = s;$/;"	d
+os	testfork.asm	/^  os = s;$/;"	d
 os	usertests.asm	/^  os = s;$/;"	d
 os	wc.asm	/^  os = s;$/;"	d
 os	zombie.asm	/^  os = s;$/;"	d
@@ -3067,6 +3051,7 @@ p	mmu.h	/^  uint p : 1;          \/\/ Present$/;"	m	struct:segdesc
 p	rm.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
 p	sh.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
 p	stressfs.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
+p	testfork.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
 p	usertests.asm	/^  p = sbrk(amt);$/;"	d
 p	usertests.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
 p	wc.asm	/^  p = sbrk(nu * sizeof(Header));$/;"	d
@@ -3111,14 +3096,18 @@ pcs	spinlock.h	/^  uint pcs[10];      \/\/ The call stack (an array of program c
 pde	kernel.asm	/^  pde = &pgdir[PDX(va)];$/;"	d
 pde_t	kernel.asm	/^pde_t entrypgdir[];  \/\/ For entry.S$/;"	l
 pde_t	types.h	/^typedef uint pde_t;$/;"	t
+pe	kernel.asm	/^    pe = walkpgdir(proc->pgdir, (void*) min->id, 0);$/;"	d
 peek	sh.c	/^peek(char **ps, char *es, char *toks)$/;"	f
 perm	vm.c	/^  int perm;$/;"	m	struct:kmap	file:
 pg	kernel.asm	/^  pg = find_pg((uint)va);$/;"	d
+pg	kernel.asm	/^  pg = find_pg(PTE_ADDR(va));$/;"	d
 pg	proc.h	/^struct pg {$/;"	s
 pg_data	proc.h	/^  struct pg_data pg_data;      \/\/ page metadata. $/;"	m	struct:proc	typeref:struct:proc::pg_data
 pg_data	proc.h	/^struct pg_data {$/;"	s
 pg_fault	vm.c	/^pg_fault(void) {$/;"	f
 pg_faults	proc.h	/^  int pg_faults;$/;"	m	struct:pg_data
+pg_pte	kernel.asm	/^        pg_pte = walkpgdir(d, (void*)i, 0); \/\/ yikes.$/;"	d
+pg_pte	kernel.asm	/^    pg_pte = walkpgdir(d, (void*)i, 0); \/\/ yikes.$/;"	d
 pg_st	proc.h	/^enum pg_st {PG_UNUSED, RAM, DISK};$/;"	g
 pg_swapouts	proc.h	/^  int pg_swapouts;$/;"	m	struct:pg_data
 pgdir	kernel.asm	/^  pgdir = 0;$/;"	d
@@ -3159,7 +3148,6 @@ piperead	pipe.c	/^piperead(struct pipe *p, char *addr, int n)$/;"	f
 pipewrite	pipe.c	/^pipewrite(struct pipe *p, char *addr, int n)$/;"	f
 popcli	spinlock.c	/^popcli(void)$/;"	f
 pos	kernel.asm	/^  pos = inb(CRTPORT+1) << 8;$/;"	d
-ppid	memsan.asm	/^  ppid = getpid();$/;"	d
 ppid	usertests.asm	/^    ppid = getpid();$/;"	d
 ppid	usertests.asm	/^  ppid = getpid();$/;"	d
 preempt	usertests.c	/^preempt(void)$/;"	f
@@ -3181,7 +3169,6 @@ procstate	proc.h	/^enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING,
 product	mp.h	/^  uchar product[20];            \/\/ product id$/;"	m	struct:mpconf
 proghdr	elf.h	/^struct proghdr {$/;"	s
 ptable	proc.c	/^} ptable;$/;"	v	typeref:struct:__anon8
-pte	kernel.asm	/^      pte = walkpgdir(proc->pgdir, (void*) iter->id, 0);$/;"	d
 pte	kernel.asm	/^    pte = walkpgdir(pgdir, (char*)a, 0);$/;"	d
 pte	kernel.asm	/^  pte = walkpgdir(pgdir, uva, 0);$/;"	d
 pte	kernel.asm	/^  pte = walkpgdir(proc->pgdir, (void *) va, 0);$/;"	d
@@ -3207,6 +3194,7 @@ r	mkdir.asm	/^  r = fstat(fd, st);$/;"	d
 r	rm.asm	/^  r = fstat(fd, st);$/;"	d
 r	sh.asm	/^  r = fstat(fd, st);$/;"	d
 r	stressfs.asm	/^  r = fstat(fd, st);$/;"	d
+r	testfork.asm	/^  r = fstat(fd, st);$/;"	d
 r	usertests.asm	/^  r = fstat(fd, st);$/;"	d
 r	wc.asm	/^  r = fstat(fd, st);$/;"	d
 r	zombie.asm	/^  r = fstat(fd, st);$/;"	d
@@ -3285,6 +3273,8 @@ s	sh.asm	/^        s = (char*)*ap;$/;"	d
 s	sh.asm	/^  s = *ps;$/;"	d
 s	stressfs.asm	/^          s = "(null)";$/;"	d
 s	stressfs.asm	/^        s = (char*)*ap;$/;"	d
+s	testfork.asm	/^          s = "(null)";$/;"	d
+s	testfork.asm	/^        s = (char*)*ap;$/;"	d
 s	umalloc.c	/^  } s;$/;"	m	union:header	typeref:struct:header::__anon2	file:
 s	usertests.asm	/^          s = "(null)";$/;"	d
 s	usertests.asm	/^        s = (char*)*ap;$/;"	d
@@ -3348,6 +3338,7 @@ src	mkdir.asm	/^  src = vsrc;$/;"	d
 src	rm.asm	/^  src = vsrc;$/;"	d
 src	sh.asm	/^  src = vsrc;$/;"	d
 src	stressfs.asm	/^  src = vsrc;$/;"	d
+src	testfork.asm	/^  src = vsrc;$/;"	d
 src	usertests.asm	/^  src = vsrc;$/;"	d
 src	wc.asm	/^  src = vsrc;$/;"	d
 src	zombie.asm	/^  src = vsrc;$/;"	d
@@ -3414,6 +3405,9 @@ state	sh.asm	/^  state = 0;$/;"	d
 state	stressfs.asm	/^        state = '%';$/;"	d
 state	stressfs.asm	/^      state = 0;$/;"	d
 state	stressfs.asm	/^  state = 0;$/;"	d
+state	testfork.asm	/^        state = '%';$/;"	d
+state	testfork.asm	/^      state = 0;$/;"	d
+state	testfork.asm	/^  state = 0;$/;"	d
 state	usertests.asm	/^        state = '%';$/;"	d
 state	usertests.asm	/^      state = 0;$/;"	d
 state	usertests.asm	/^  state = 0;$/;"	d
@@ -3516,6 +3510,11 @@ static	stressfs.asm	/^static Header base;$/;"	l
 static	stressfs.asm	/^static Header*$/;"	l
 static	stressfs.asm	/^static inline void$/;"	l
 static	stressfs.asm	/^static void$/;"	l
+static	testfork.asm	/^static Header *freep;$/;"	l
+static	testfork.asm	/^static Header base;$/;"	l
+static	testfork.asm	/^static Header*$/;"	l
+static	testfork.asm	/^static inline void$/;"	l
+static	testfork.asm	/^static void$/;"	l
 static	usertests.asm	/^static Header *freep;$/;"	l
 static	usertests.asm	/^static Header base;$/;"	l
 static	usertests.asm	/^static Header*$/;"	l
@@ -3551,7 +3550,7 @@ sum	mp.c	/^sum(uchar *addr, int len)$/;"	f	file:
 superblock	fs.h	/^struct superblock {$/;"	s
 swapFile	proc.h	/^  struct file *swapFile;			 \/\/page file$/;"	m	struct:proc	typeref:struct:proc::file
 swapfile_cell	proc.h	/^struct swapfile_cell {$/;"	s
-swapin	vm.c	/^swapin(uint va) { \/\/ fault address$/;"	f	file:
+swapin	vm.c	/^swapin(uint va) { \/\/  fault address$/;"	f	file:
 swapout	vm.c	/^swapout(struct pg* pg) {$/;"	f	file:
 switchkvm	vm.c	/^switchkvm(void)$/;"	f
 switchuvm	vm.c	/^switchuvm(struct proc *p)$/;"	f
@@ -3646,6 +3645,7 @@ uint	mkdir.asm	/^uint$/;"	l
 uint	rm.asm	/^uint$/;"	l
 uint	sh.asm	/^uint$/;"	l
 uint	stressfs.asm	/^uint$/;"	l
+uint	testfork.asm	/^uint$/;"	l
 uint	types.h	/^typedef unsigned int   uint;$/;"	t
 uint	usertests.asm	/^uint$/;"	l
 uint	wc.asm	/^uint$/;"	l
@@ -4193,17 +4193,16 @@ void	grep.asm	/^void$/;"	l
 void	init.asm	/^void$/;"	l
 void	kernel.asm	/^void cmostime(struct rtcdate *r)$/;"	l
 void	kernel.asm	/^void count_kernel_pgs(void) {$/;"	l
-void	kernel.asm	/^void nfu_update(void) {$/;"	l
 void	kernel.asm	/^void$/;"	l
 void	kill.asm	/^void$/;"	l
 void	ln.asm	/^void$/;"	l
 void	ls.asm	/^void$/;"	l
-void	memsan.asm	/^void mem2(){$/;"	l
 void	memsan.asm	/^void$/;"	l
 void	mkdir.asm	/^void$/;"	l
 void	rm.asm	/^void$/;"	l
 void	sh.asm	/^void$/;"	l
 void	stressfs.asm	/^void$/;"	l
+void	testfork.asm	/^void$/;"	l
 void	usertests.asm	/^void dirtest(void)$/;"	l
 void	usertests.asm	/^void$/;"	l
 void	wc.asm	/^void$/;"	l
@@ -4255,6 +4254,8 @@ x	sh.asm	/^    x = -xx;$/;"	d
 x	sh.asm	/^    x = xx;$/;"	d
 x	stressfs.asm	/^    x = -xx;$/;"	d
 x	stressfs.asm	/^    x = xx;$/;"	d
+x	testfork.asm	/^    x = -xx;$/;"	d
+x	testfork.asm	/^    x = xx;$/;"	d
 x	umalloc.c	/^  Align x;$/;"	m	union:header	file:
 x	usertests.asm	/^    x = -xx;$/;"	d
 x	usertests.asm	/^    x = x * 1103515245 + 12345;$/;"	d
